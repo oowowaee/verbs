@@ -10,6 +10,11 @@ class Infinitive(models.Model):
   top_250 = models.BooleanField(default = False)
   common_in_la = models.BooleanField(default = False)
 
+  class Meta:
+    ordering = ('name',)
+    
+  def __str__(self):
+    return self.name
 
 class Gerund(models.Model):
   infinitive = models.ForeignKey(Infinitive)
@@ -29,6 +34,8 @@ class Tense(models.Model):
   mood = models.CharField(max_length = 50) 
   mood_translation = models.CharField(max_length = 50) 
 
+  def __str__(self):
+    return '{0} {1}'.format(self.tense, self.mood)
 
 class Conjugation(models.Model):
   infinitive = models.ForeignKey(Infinitive)
