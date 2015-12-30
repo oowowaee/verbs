@@ -33,8 +33,11 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
+    # THIRD PARTY APPS #
     'rest_framework',
     'rest_framework.authtoken',
+    'djoser',
+    # APPS #
     'verbs'
 )
 
@@ -73,6 +76,14 @@ TEMPLATES = [
         },
     },
 ]
+
+DJOSER = {
+    # 'DOMAIN': 'frontend.com',
+    # 'SITE_NAME': 'Frontend',
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    #'SEND_ACTIVATION_EMAIL': True,
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
