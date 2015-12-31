@@ -18,6 +18,7 @@ verbs, verbs_infinitive, verbs_tense WHERE verbs_infinitive.name = verbs.infinit
 API endpoints:
 
 api/
+
 	conjugations/
 		Filter by infinitive
 		Filter by tense
@@ -42,3 +43,16 @@ api/
 	/tenses
 	/verbs
 		*users need to be able to set their tenses and verbs
+
+
+	(Added by Djoser)
+	auth/
+		/me/
+		/register/
+		/login/ (token based authentication)
+		/logout/ (token based authentication)
+		/activate/
+		/{{ User.USERNAME_FIELD }}/
+		/password/
+		/password/reset/
+		/password/reset/confirm/

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from .models import Infinitive, Conjugation
 from .serializers import InfinitiveSerializer, ConjugationSerializer
-from common.views import DefaultsMixin, DefaultPagination
+from common.views import DefaultsMixin
 
 class InfinitiveViewSet(DefaultsMixin, viewsets.ModelViewSet):
 	"""API endpoint for listing infinitives."""
