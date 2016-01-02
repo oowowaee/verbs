@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'debug_toolbar',
     # APPS #
     'verbs'
 )
@@ -101,11 +102,11 @@ LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
-USE_I18N = True
+USE_I18N = False
 
-USE_L10N = True
+USE_L10N = False
 
-USE_TZ = True
+USE_TZ = False
 
 CORS_ORIGIN_ALLOW_ALL = True
 

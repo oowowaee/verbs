@@ -30,12 +30,18 @@ class Pastparticiple(models.Model):
 
 class Tense(models.Model):
   tense = models.CharField(max_length = 50)
-  translation = models.CharField(max_length = 50)
+  tense_translation = models.CharField(max_length = 50)
   mood = models.CharField(max_length = 50) 
   mood_translation = models.CharField(max_length = 50) 
 
   def __str__(self):
-    return '{0} {1}'.format(self.tense, self.mood)
+    return '{0} {1}'.format(self.tense_translation, self.mood)
+
+  def name(self):
+    return self.__str__()
+
+  def translation(self):
+    return '{0} {1}'.format(self.tense_translation, self.mood_translation)
 
 class Conjugation(models.Model):
   infinitive = models.ForeignKey(Infinitive)

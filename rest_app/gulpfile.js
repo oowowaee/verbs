@@ -1,9 +1,9 @@
 'use strict';
 
-var gulp 		= require('gulp'),
-	sass 		= require('gulp-sass'),
+var gulp 		  = require('gulp'),
+	sass 		    = require('gulp-sass'),
 	minifycss 	= require('gulp-minify-css'),
-	rename 		= require('gulp-rename'),
+	rename 		  = require('gulp-rename'),
   concat      = require('gulp-concat'),
   uglify      = require('gulp-uglify'),
   templateCache = require('gulp-angular-templatecache');
@@ -45,5 +45,5 @@ gulp.task('templates', function () {
 gulp.task('default', ['sass', 'vendors', 'js'], function() {
   gulp.watch('static/scss/*.scss', ['sass']);
   gulp.watch('static/js/*.js', ['js']);
-  gulp.watch('static/templates/*.html', ['templates', 'js']);
+  gulp.watch('static/templates/*.html', ['js']);
 });
