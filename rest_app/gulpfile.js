@@ -4,12 +4,12 @@ var gulp 		= require('gulp'),
 	sass 		= require('gulp-sass'),
 	minifycss 	= require('gulp-minify-css'),
 	rename 		= require('gulp-rename'),
-    concat      = require('gulp-concat'),
-    uglify      = require('gulp-uglify'),
-    templateCache = require('gulp-angular-templatecache');
+  concat      = require('gulp-concat'),
+  uglify      = require('gulp-uglify'),
+  templateCache = require('gulp-angular-templatecache');
 
 var config = {
-    sassPath: 'static/scss',
+  sassPath: 'static/scss',
 };
 
 gulp.task('sass', function () {

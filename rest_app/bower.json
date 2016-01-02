@@ -16,13 +16,12 @@
     "tests"
   ],
   "devDependencies": {
-    "bootstrap-sass": "~3.3.6"
-  },
-  "dependencies": {
+    "bootstrap-sass": "~3.3.6",
     "angular": "~1.4.8",
     "angular-ui-router": "~0.2.15",
-    "ui-bootstrap": "~0.14.3",
     "components-font-awesome": "~4.5.0",
     "angular-bootstrap": "~0.14.3"
+  },
+  "dependencies": {
   }
 }
