@@ -3,9 +3,22 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from verbs.models import Infinitive, Tense
 
 class VerbUser(AbstractUser):
   vosotros = models.BooleanField(default = True)
+  infinitives = models.ManyToManyField('verbs.Infinitive')
+  tenses = models.ManyToManyField('verbs.Tense')
+
+  def save(self, *args, **kwargs):
+  	pk = self.pk
+  	super(VerbUser, self).save(*args, **kwargs)
+
+  	if not pk:
+  		#Create the default associations to the verbs
+  		self.infinitives = Infinitive.objects.filter(from_duolingo = True)
+  		self.tenses = Tense.objects.filter(default = True)
+  		self.save()
 
 class History(models.Model):
   content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)

@@ -65,4 +65,6 @@ api/
 
 Duolingo verbs harvested from words page, and applying the following regexs:
 ^.*(er|ir|ar)\s+Verb.*
+
+
 ^([^\s]*)\s*.*$

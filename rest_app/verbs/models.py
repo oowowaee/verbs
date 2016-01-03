@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
-from users.models import VerbUser, History
 
 class Infinitive(models.Model):
   is_reflexive = models.BooleanField(default = False)
@@ -11,7 +10,6 @@ class Infinitive(models.Model):
   from_duolingo = models.BooleanField(default = False)
   top_100 = models.BooleanField(default = False)
   common_in_la = models.BooleanField(default = False)
-  users = models.ManyToManyField(VerbUser, related_query_name='infinitives')
 
   class Meta:
     ordering = ('name',)
@@ -20,14 +18,14 @@ class Infinitive(models.Model):
     return self.name
 
 class Gerund(models.Model):
-  histories = GenericRelation(History, related_query_name='gerunds')
+  histories = GenericRelation('users.History', related_query_name='gerunds')
   infinitive = models.ForeignKey(Infinitive)
   gerund = models.CharField(max_length = 50) 
   translation = models.CharField(max_length = 125)
 
 
 class Pastparticiple(models.Model):
-  histories = GenericRelation(History, related_query_name='participles')
+  histories = GenericRelation('users.History', related_query_name='participles')
   infinitive = models.ForeignKey(Infinitive)
   pastparticiple = models.CharField(max_length = 50) 
   translation = models.CharField(max_length = 50) 
@@ -38,7 +36,6 @@ class Tense(models.Model):
   tense_translation = models.CharField(max_length = 50)
   mood = models.CharField(max_length = 50) 
   mood_translation = models.CharField(max_length = 50) 
-  users = models.ManyToManyField(VerbUser, related_query_name='tenses')
   default = models.BooleanField(default = False)
 
   def __str__(self):
@@ -51,7 +48,7 @@ class Tense(models.Model):
     return '{0} {1}'.format(self.tense_translation, self.mood_translation)
 
 class Conjugation(models.Model):
-  histories = GenericRelation(History, related_query_name='conjugations')
+  histories = GenericRelation('users.History', related_query_name='conjugations')
   infinitive = models.ForeignKey(Infinitive)
   tense = models.ForeignKey(Tense)
   irregular = models.BooleanField(default = False)

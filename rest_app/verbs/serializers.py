@@ -10,7 +10,7 @@ class InfinitiveSerializer(serializers.ModelSerializer):
 class TenseSerializer(serializers.ModelSerializer):	
 	class Meta:
 		model = Tense
-		fields = ('name', 'translation')
+		fields = ('id', 'default', 'name', 'translation')
 
 
 class ConjugationSerializer(serializers.ModelSerializer):

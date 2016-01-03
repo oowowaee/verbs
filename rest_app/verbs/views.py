@@ -1,8 +1,8 @@
 from rest_framework import viewsets
 
 from .models import Infinitive, Conjugation, Gerund, Pastparticiple
-from .serializers import InfinitiveSerializer, ConjugationSerializer, GerundSerializer, PastparticipleSerializer
-from common.views import DefaultsMixin, RandomViewMixin
+from .serializers import *
+from common.views import DefaultsMixin, RandomViewMixin, ListOrUpdateViewSet
 
 class InfinitiveViewSet(DefaultsMixin, viewsets.ModelViewSet):
 	"""API endpoint for listing infinitives."""
@@ -26,3 +26,9 @@ class PastparticipleViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSe
 	"""API endpoint for listing infinitives."""
 	queryset = Pastparticiple.objects.all().select_related('infinitive')
 	serializer_class = PastparticipleSerializer
+
+
+class TenseViewSet(DefaultsMixin, ListOrUpdateViewSet):
+	"""API endpoint for listing infinitives."""
+	queryset = Tense.objects.all()
+	serializer_class = TenseSerializer
