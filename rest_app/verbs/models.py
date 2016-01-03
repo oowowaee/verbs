@@ -9,7 +9,7 @@ class Infinitive(models.Model):
   name = models.CharField(max_length = 50)
   active = models.BooleanField(default = True)
   from_duolingo = models.BooleanField(default = False)
-  top_250 = models.BooleanField(default = False)
+  top_100 = models.BooleanField(default = False)
   common_in_la = models.BooleanField(default = False)
   users = models.ManyToManyField(VerbUser, related_query_name='infinitives')
 
@@ -39,6 +39,7 @@ class Tense(models.Model):
   mood = models.CharField(max_length = 50) 
   mood_translation = models.CharField(max_length = 50) 
   users = models.ManyToManyField(VerbUser, related_query_name='tenses')
+  default = models.BooleanField(default = False)
 
   def __str__(self):
     return '{0} {1}'.format(self.tense_translation, self.mood)

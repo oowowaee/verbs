@@ -26,6 +26,12 @@ api/
 		:id
 		random/
 
+	gerunds/
+		random/
+
+	participles/
+		random/
+
 	verb
 		/:id     	
 		/history
@@ -56,3 +62,7 @@ api/
 		/password/
 		/password/reset/
 		/password/reset/confirm/
+
+Duolingo verbs harvested from words page, and applying the following regexs:
+^.*(er|ir|ar)\s+Verb.*
+^([^\s]*)\s*.*$

@@ -4,7 +4,7 @@ from .models import Infinitive, Conjugation, Tense, Gerund, Pastparticiple
 class InfinitiveSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Infinitive
-		fields = ('id', 'name', 'translation')
+		fields = ('id', 'name', 'translation', 'from_duolingo', 'top_100')
 
 
 class TenseSerializer(serializers.ModelSerializer):	
@@ -20,13 +20,16 @@ class ConjugationSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Conjugation
 
+
 class GerundSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Gerund
 
+
 class PastparticipleSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Pastparticiple
+
 
 class VerbSerializer(serializers.Serializer):
 	pass
