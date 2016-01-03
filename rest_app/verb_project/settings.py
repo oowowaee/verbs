@@ -30,24 +30,25 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.staticfiles',
-    # THIRD PARTY APPS #
-    'corsheaders',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'djoser',
-    'debug_toolbar',
-    # APPS #
-    'verbs'
+  'django.contrib.auth',
+  'django.contrib.contenttypes',
+  'django.contrib.staticfiles',
+  # THIRD PARTY APPS #
+  'corsheaders',
+  'rest_framework',
+  'rest_framework.authtoken',
+  'djoser',
+  'debug_toolbar',
+  # APPS #
+  'verbs',
+  'users',
 )
 
 MIDDLEWARE_CLASSES = (
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+  'corsheaders.middleware.CorsMiddleware',
+  'django.middleware.common.CommonMiddleware',
+  'django.middleware.csrf.CsrfViewMiddleware',
+  'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'verb_project.urls'
@@ -59,40 +60,40 @@ WSGI_APPLICATION = 'verb_project.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'verbos',
-    }
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'verbos',
+  }
 }
 
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-            ],
-        },
+  {
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [TEMPLATE_DIR],
+    'APP_DIRS': True,
+    'OPTIONS': {
+      'context_processors': [
+        'django.template.context_processors.debug',
+        'django.template.context_processors.request',
+        'django.contrib.auth.context_processors.auth',
+      ],
     },
+  },
 ]
 
 DJOSER = {
-    # 'DOMAIN': 'frontend.com',
-    # 'SITE_NAME': 'Frontend',
-    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    #'SEND_ACTIVATION_EMAIL': True,
+  # 'DOMAIN': 'frontend.com',
+  # 'SITE_NAME': 'Frontend',
+  'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+  'ACTIVATION_URL': '#/activate/{uid}/{token}',
+  #'SEND_ACTIVATION_EMAIL': True,
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    )
+  'DEFAULT_AUTHENTICATION_CLASSES': (
+    'rest_framework.authentication.BasicAuthentication',
+    'rest_framework.authentication.TokenAuthentication',
+  )
 }
 
 # Internationalization
@@ -110,8 +111,14 @@ USE_TZ = False
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+AUTH_USER_MODEL = 'users.VerbUser'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
+
+FIXTURE_DIRS = (
+  os.path.join(BASE_DIR, "fixtures"),
+)
 
 STATIC_URL = '/static/'
 

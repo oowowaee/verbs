@@ -13,7 +13,7 @@ class RandomViewMixin(object):
 	# For GET Requests
 	@list_route()
 	def random(self, request):
-		""" Returns a list of location objects somehow related to MyObject """
+		""" Adds a route to a viewset displaying a random list of objects """
 		qs = self.queryset.order_by('?')[:10]
 
 		serializer = self.get_serializer(qs, many=True)
@@ -21,7 +21,6 @@ class RandomViewMixin(object):
 		return Response(serializer.data)
 
 class DefaultsMixin(object):
-	"""Default settings for view authentication, permissions,
-	filtering and pagination."""
+	""" Default settings for view authentication, permissions, filtering and pagination. """
 	permission_classes = (IsAuthenticated,)
 	pagination_class = DefaultPagination

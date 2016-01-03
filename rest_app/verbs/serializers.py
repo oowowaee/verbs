@@ -21,12 +21,10 @@ class ConjugationSerializer(serializers.ModelSerializer):
 		model = Conjugation
 
 class GerundSerializer(serializers.ModelSerializer):
-
 	class Meta:
 		model = Gerund
 
 class PastparticipleSerializer(serializers.ModelSerializer):
-
 	class Meta:
 		model = Pastparticiple
 
