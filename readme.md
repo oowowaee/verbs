@@ -15,22 +15,22 @@ INSERT INTO verbs_conjugation (irregular, infinitive_id, tense_id, form_1s, form
 verbs, verbs_infinitive, verbs_tense WHERE verbs_infinitive.name = verbs.infinitive AND verbs_tense.mood = verbs.mood AND verbs_tense.tense = verbs.tense;
 
 
-API endpoints:
+API endpoints (+has been implemented):
 
 api/
 
-	conjugations/
+	+conjugations/
 		Filter by infinitive
 		Filter by tense
 		Filter by 
-		:id
-		random/
+		+:id/
+		+random/
 
-	gerunds/
-		random/
+	+gerunds/
+		+random/
 
-	participles/
-		random/
+	+participles/
+		+random/
 
 	verb
 		/:id     	
@@ -38,20 +38,20 @@ api/
 		*admins need to be able to post edits
 		*admins need to be able to create new verbs
 
-	infinitive
-		/:id
+	+infinitives/
+		+:id/
 		*admins need to be able to post, to update the list of active verbs
 			/activate?
 
 	/score
 		*users need to be able to post scores as well as a list
 
-	/tenses
-	/verbs
+	+tenses/
+		:id/activate?
 		*users need to be able to set their tenses and verbs
 
 
-	(Added by Djoser)
+	(+Added by Djoser)
 	auth/
 		/me/
 		/register/
@@ -64,6 +64,7 @@ api/
 		/password/reset/confirm/
 
 Duolingo verbs harvested from words page, and applying the following regexs:
+
 ^.*(er|ir|ar)\s+Verb.*
 
 

@@ -13,7 +13,6 @@ angular.module('verbs.controllers', ['ngMessages'])
       UserFactory.login({
         'username': $scope.authorization.username,
         'password': $scope.authorization.password}, function(res) {
-          $http.defaults.headers.common.Authorization = 'Token ' + res.auth_token;
           $state.go('app.home');
 
           //Set header
@@ -25,6 +24,7 @@ angular.module('verbs.controllers', ['ngMessages'])
   };
 }])
 
-.controller('PracticeCtrl', ['$scope', 'ConjugationFactory', function($scope, ConjugationFactory) {
-
+.controller('ExerciseCtrl', ['$scope', 'Questions', function($scope, Questions) {
+  console.log(Questions);
+  console.log(Questions.length);
 }]);
