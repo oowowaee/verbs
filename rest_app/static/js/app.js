@@ -1,6 +1,6 @@
-angular.module('verb', ['ui.router', 'ui.bootstrap', 'templates'])
+angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
 
-.run(function($rootScope) {
+.run(['$rootScope', function($rootScope) {
   $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
     console.log('$stateChangeStart to '+toState.to+'- fired when the transition begins. toState,toParams : \n',toState, toParams);
   });
@@ -22,11 +22,11 @@ angular.module('verb', ['ui.router', 'ui.bootstrap', 'templates'])
     console.log('$stateNotFound '+unfoundState.to+'  - fired when a state cannot be found by its name.');
     console.log(unfoundState, fromState, fromParams);
   });
-})
+}])
+.config(['$stateProvider', '$urlRouterProvider', '$resourceProvider', function($stateProvider, $urlRouterProvider, $resourceProvider) {
+  $resourceProvider.defaults.stripTrailingSlashes = false;
 
-.config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
-
   .state('app', {
     url: '',
     abstract: true,
@@ -41,7 +41,32 @@ angular.module('verb', ['ui.router', 'ui.bootstrap', 'templates'])
         templateUrl: 'home.html',
       }
     }
+  }).
+  state('app.login', {
+    url: '/login',
+    views: {
+      'content': {
+        templateUrl: 'login.html',
+        controller: 'LoginCtrl',
+      }
+    }
+  }).
+  state('app.verbs', {
+    url: '/verbs',
+    views: {
+      'content': {
+        templateUrl: 'verbs.html',
+      }
+    }
+  }).
+  state('app.tenses', {
+    url: '/tenses',
+    views: {
+      'content': {
+        templateUrl: 'tenses.html',
+      }
+    }
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/home');
-});
+}]);

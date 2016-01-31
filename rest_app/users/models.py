@@ -7,8 +7,8 @@ from verbs.models import Infinitive, Tense
 
 class VerbUser(AbstractUser):
   vosotros = models.BooleanField(default = True)
-  infinitives = models.ManyToManyField('verbs.Infinitive')
-  tenses = models.ManyToManyField('verbs.Tense')
+  infinitives = models.ManyToManyField('verbs.Infinitive', related_query_name='infinitive_users')
+  tenses = models.ManyToManyField('verbs.Tense', related_query_name='tense_users')
 
   def save(self, *args, **kwargs):
   	pk = self.pk

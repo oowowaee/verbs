@@ -15,7 +15,16 @@
         <li class="active"><a href="#">Home</a></li>
         <li><a href="#about">Practice</a></li>
         <li><a href="#contact">History</a></li>
-        <li><a href="#contact">Logout</a></li>
+        <li uib-dropdown>
+          <a href="#" uib-dropdown-toggle role="button" aria-haspopup="true" aria-expanded="false">User <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a ui-sref="app.login">Login</a></li>
+            <li><a href="#">Logout</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a ui-sref="app.tenses">Set Tenses</a></li>
+            <li><a ui-sref="app.verbs">Set Verbs</a></li>
+          </ul>
+        </li>
       </ul>
     </div><!--/.nav-collapse -->
   </div>
@@ -26,5 +35,4 @@
   <div class="jumbotron">
     <div ui-view="content"></div>
   </div>
-
 </div> <!-- /container -->

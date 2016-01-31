@@ -20,7 +20,7 @@ class RandomViewMixin(object):
 	@list_route()
 	def random(self, request):
 		""" Adds a route to a viewset displaying a random list of objects """
-		qs = self.queryset.order_by('?')[:10]
+		qs = self.get_queryset().order_by('?')[:10]
 
 		serializer = self.get_serializer(qs, many=True)
 

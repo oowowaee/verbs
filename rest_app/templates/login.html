@@ -1,0 +1,27 @@
+<form name="loginForm" novalidate ng-submit="login(loginForm)">
+  <div ng-show="invalidLogin">
+    Username not valid :(
+  </div>
+
+  <label class="item item-input" ng-class="{'has-errors': loginForm.username.$invalid && loginForm.$submitted, 'no-errors': loginForm.username.$valid}">
+    <span class="input-label">Username</span>
+    <input type="text" name="username" ng-model="authorization.username" ng-minlength="5" ng-maxlength="20" required>
+  </label>
+       
+  <div class="error-container" ng-show="loginForm.username.$error" ng-messages="loginForm.username.$error">
+    <div ng-messages-include="templates/errors.html"></div>
+  </div>
+   
+  <label class="item item-input" ng-class="{'has-errors': loginForm.password.$invalid && loginForm.$submitted, 'no-errors': loginForm.password.$valid}">
+    <span class="input-label">Password</span>
+    <input type="password" name="password" ng-model="authorization.password" ng-minlength="5" ng-maxlength="20" required>
+  </label>
+   
+  <div class="error-container last-error-container" ng-show="loginForm.password.$error && loginForm.$submitted" ng-messages="loginForm.password.$error">
+    <div ng-messages-include="templates/errors.html"></div> 
+  </div>          
+ 
+  <button class="btn btn-primary" type="submit">
+    Sign In
+  </button>
+</form>
