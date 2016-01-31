@@ -54,5 +54,22 @@ class BasicSerializerTestCase(APITestCase):
       else:
         self.assertEqual(r['selected'], False)
 
+  def test_patch_user_tense_serializer(self):
+    NUMBER_SET_TO_TRUE = 3
+    self.user.tenses = []
+    self.user.save()
 
+    self.assertEqual(self.user.tenses.count(), 0)
 
+    url = reverse('user-tenses')
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    result = json.loads(response.content)
+
+    for i, r in enumerate(result):
+      if i < NUMBER_SET_TO_TRUE:
+        r['selected'] = True
+
+    response = self.client.patch(url, result, format='json')
+    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    self.assertEqual(self.user.tenses.count(), NUMBER_SET_TO_TRUE)
