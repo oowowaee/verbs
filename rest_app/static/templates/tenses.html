@@ -1,1 +1,22 @@
 <h3>Set Tenses</h3>
+
+<div class="col-md-6">
+  <div class="checkbox" ng-repeat="t in userTenses.tenses | slice:0:userTenses.totalTenses/2 track by t.id">
+    <label>
+    <input type="checkbox" ng-model="t.selected" />
+      &nbsp;&nbsp;{{ t.translation }}
+    </label>
+  </div>
+</div>
+<div class="col-md-6">
+  <div class="checkbox" ng-repeat="t in userTenses.tenses | slice:userTenses.totalTenses/2:userTenses.totalTenses track by t.id">
+    <label>
+    <input type="checkbox" ng-model="t.selected" />
+      &nbsp;&nbsp;{{ t.translation }}
+    </label>
+  </div>
+</div>
+
+<div class="text-center">
+  <button class="btn btn-primary" ng-click="userTenses.save()">Save</button>
+</div>

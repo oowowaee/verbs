@@ -1,12 +1,13 @@
 angular.module('verbs.factories', ['ngResource'])
 
 .factory('UserFactory', ['$http', '$resource', '$window', 'DOMAIN', function($http, $resource, $window, DOMAIN) {
-	return $resource(DOMAIN + '/auth/',
+  return $resource(DOMAIN + '/auth/',
     null,
-		{
+    {
       'login': {url: DOMAIN + '/api/auth/login/', method: 'POST', interceptor: loginInterceptor()},
-		  'logout': {url: DOMAIN + '/api/auth/logout/', method: 'POST', interceptor: logoutInterceptor()},
-      'getTenses': {url: DOMAIN + '/api/user/tenses', method: 'GET'}
+      'logout': {url: DOMAIN + '/api/auth/logout/', method: 'POST', interceptor: logoutInterceptor()},
+      'getTenses': {url: DOMAIN + '/api/user/tenses/', method: 'GET', isArray: true},
+      'setTenses': {url: DOMAIN + '/api/user/tenses/', method: 'PATCH'}
     }
   );
 

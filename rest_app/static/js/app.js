@@ -1,4 +1,4 @@
-angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
+angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
 
 .run(['$rootScope', function($rootScope) {
   $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
@@ -48,6 +48,7 @@ angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 
       'content': {
         templateUrl: 'login.html',
         controller: 'LoginCtrl',
+        controllerAS: 'loginPage'
       }
     }
   }).
@@ -64,11 +65,13 @@ angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 
     views: {
       'content': {
         templateUrl: 'tenses.html',
+        controller: 'UserTensesController',
+        controllerAs: 'userTenses'
       }
     },
     resolve: {
       Tenses: function(UserFactory) {
-        return UserFactory.getTenses();
+        return UserFactory.getTenses().$promise;
       }
     }
   });

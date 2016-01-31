@@ -1,7 +1,7 @@
 <br/>
 <br />
-<form name="loginForm" class="form-horizontal col-md-8 col-md-offset-2" novalidate ng-submit="login(loginForm)">
-  <div class="text-center" ng-show="invalidLogin">
+<form name="loginForm" class="form-horizontal col-md-8 col-md-offset-2" novalidate ng-submit="loginPage.login(loginForm)">
+  <div class="text-center" ng-show="loginPage.invalidLogin">
     <div class="alert alert-danger">
       We were unable to log you in with the provided credentials.
     </div>
@@ -12,7 +12,7 @@
       Username
     </label>
     <div class="col-sm-10">
-      <input id="username" class="form-control" type="text" name="username" ng-model="authorization.username" ng-minlength="5" ng-maxlength="20" required>
+      <input id="username" class="form-control" type="text" name="username" ng-model="loginPage.authorization.username" ng-minlength="5" ng-maxlength="20" required>
     </div>     
     <div class="error-container" ng-show="loginForm.username.$error" ng-messages="loginForm.username.$error">
       <div ng-messages-include="errors.html"></div>
@@ -24,7 +24,7 @@
       Password
     </label>
     <div class="col-sm-10">
-      <input id="password" class="form-control" type="password" name="password" ng-model="authorization.password" ng-minlength="5" ng-maxlength="20" required>
+      <input id="password" class="form-control" type="password" name="password" ng-model="loginPage.authorization.password" ng-minlength="5" ng-maxlength="20" required>
     </div>
     <div class="error-container last-error-container" ng-show="loginForm.password.$error && loginForm.$submitted" ng-messages="loginForm.password.$error">
       <div ng-messages-include="errors.html"></div> 
