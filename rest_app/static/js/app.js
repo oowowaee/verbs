@@ -65,6 +65,11 @@ angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 
       'content': {
         templateUrl: 'tenses.html',
       }
+    },
+    resolve: {
+      Tenses: function(UserFactory) {
+        return UserFactory.getTenses();
+      }
     }
   });
   // if none of the above states are matched, use this as the fallback

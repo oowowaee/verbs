@@ -5,7 +5,8 @@ angular.module('verbs.factories', ['ngResource'])
     null,
 		{
       'login': {url: DOMAIN + '/api/auth/login/', method: 'POST', interceptor: loginInterceptor()},
-		  'logout': {url: DOMAIN + '/api/auth/logout/', method: 'POST', interceptor: logoutInterceptor()}
+		  'logout': {url: DOMAIN + '/api/auth/logout/', method: 'POST', interceptor: logoutInterceptor()},
+      'getTenses': {url: DOMAIN + '/api/user/tenses', method: 'GET'}
     }
   );
 
@@ -32,6 +33,9 @@ angular.module('verbs.factories', ['ngResource'])
   }
 }])
 
+/*
+  Augment a resource with a random method.
+ */
 .factory('RandomEndPointFactory', ['$resource', 'DOMAIN', function($resource, DOMAIN) {
   return function(type) {
     return $resource(DOMAIN + '/api/' + type + '/:id',

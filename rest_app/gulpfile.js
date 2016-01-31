@@ -26,6 +26,7 @@ gulp.task('sass', function () {
 
 gulp.task('vendors', function () {
  return gulp.src(['static/vendors/**/*.min.js', 
+                  '!static/vendors/angular/**/*.js', 
                   '!static/vendors/jquery/**/*.min.js', 
                   '!static/vendors/bootstrap-sass/**/*.min.js'])
         .pipe(concat('vendors.min.js'))
@@ -41,7 +42,7 @@ gulp.task('js', ['templates'], function () {
  });
 
 gulp.task('templates', function () {
- return gulp.src('templates/*.html')
+ return gulp.src('static/templates/*.html')
         .pipe(templateCache({'standalone': true}))
         .pipe(gulp.dest('static/js'));
  });
@@ -49,7 +50,7 @@ gulp.task('templates', function () {
 gulp.task('watch', ['sass', 'vendors', 'js'], function() {
   gulp.watch('static/scss/*.scss', ['sass']);
   gulp.watch('static/js/*.js', ['js']);
-  gulp.watch('templates/*.html', ['js']);
+  gulp.watch('static/templates/*.html', ['js']);
 });
 
 gulp.task('default', ['watch']);

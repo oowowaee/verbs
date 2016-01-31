@@ -1,7 +1,17 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
-from verbs.urls import router
+from rest_framework.routers import DefaultRouter
+from users import views as userviews 
+from verbs import views as verbviews
+
+router = DefaultRouter()
+router.register(r'infinitives', verbviews.InfinitiveViewSet)
+router.register(r'conjugations', verbviews.ConjugationViewSet)
+router.register(r'tenses', verbviews.TenseViewSet)
+router.register(r'gerunds', verbviews.GerundViewSet)
+router.register(r'participles', verbviews.PastparticipleViewSet)
+router.register(r'user', userviews.UserViewSet, base_name='user')
 
 urlpatterns = patterns('',
 	url(r'^api/auth/', include('djoser.urls.authtoken')),

@@ -1,4 +1,5 @@
 Running the django server:
+
 	cd django 
 	source bin/active
 	cd verbs/rest_app
@@ -44,6 +45,10 @@ api/
 		:id/activate?
 		*users need to be able to set their tenses and verbs
 
+	user/
+		+/tenses 	(GET)
+		/tenses 	(POST)
+		/infinitives
 
 	(+Added by Djoser)
 	auth/
