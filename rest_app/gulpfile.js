@@ -43,7 +43,7 @@ gulp.task('js', ['templates'], function () {
 
 gulp.task('templates', function () {
  return gulp.src('static/templates/*.html')
-        .pipe(templateCache({'standalone': true}))
+        .pipe(templateCache({'standalone': true, moduleSystem: 'IIFE'}))
         .pipe(gulp.dest('static/js'));
  });
 

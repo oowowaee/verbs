@@ -13,8 +13,8 @@ router.register(r'gerunds', verbviews.GerundViewSet)
 router.register(r'participles', verbviews.PastparticipleViewSet)
 router.register(r'user', userviews.UserViewSet, base_name='user')
 
-urlpatterns = patterns('',
+urlpatterns = [
 	url(r'^api/auth/', include('djoser.urls.authtoken')),
 	url(r'^$', TemplateView.as_view(template_name='index.html'), name="home"),
 	url(r'^api/', include(router.urls)),
-)
+]
