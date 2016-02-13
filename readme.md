@@ -46,9 +46,10 @@ api/
 		*users need to be able to set their tenses and verbs
 
 	user/
-		+/tenses 	(GET)
-		/tenses 	(POST)
-		/infinitives
+		+/tenses 		(GET)
+		+/tenses 		(PATCH)
+		/infinitives	(GET)
+		/infinitives	(PATCH)
 
 	(+Added by Djoser)
 	auth/

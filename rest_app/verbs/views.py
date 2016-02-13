@@ -26,6 +26,7 @@ class GerundViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSet):
     qs = Gerund.objects.select_related('infinitive').filter(infinitive__infinitive_users = user.id)
     return qs
 
+
 class PastparticipleViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSet):
   """API endpoint for listing infinitives."""
   serializer_class = PastparticipleSerializer
@@ -35,6 +36,7 @@ class PastparticipleViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSe
     user = self.request.user
     qs = Pastparticiple.objects.select_related('infinitive').filter(infinitive__infinitive_users = user.id)
     return qs
+
 
 class TenseViewSet(DefaultsMixin, ListOrUpdateViewSet):
   """API endpoint for listing infinitives."""

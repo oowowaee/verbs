@@ -1,0 +1,31 @@
+<h3>Set Infinitives</h3>
+
+<div class="col-md-4">
+  <div class="checkbox" ng-repeat="i in userInfinitives.infinitives | slice:0:userInfinitives.thirdOfResults track by i.id">
+    <label>
+    <input type="checkbox" ng-model="i.selected" ng-change="userInfinitives.setInfinitive(i.id, i.selected)"/>
+      &nbsp;&nbsp;{{ i.name }}
+    </label>
+  </div>
+</div>
+<div class="col-md-4">
+  <div class="checkbox" ng-repeat="i in userInfinitives.infinitives | slice:userInfinitives.thirdOfResults:userInfinitives.thirdOfResults*2 track by i.id">
+    <label>
+    <input type="checkbox" ng-model="i.selected" ng-change="userInfinitives.setInfinitive(i.id, i.selected)"/>
+      &nbsp;&nbsp;{{ i.name }}
+    </label>
+  </div>
+</div>
+<div class="col-md-4">
+  <div class="checkbox" ng-repeat="i in userInfinitives.infinitives | slice:userInfinitives.thirdOfResults*2:userInfinitives.totalInfinitives track by i.id">
+    <label>
+    <input type="checkbox" ng-model="i.selected" ng-change="userInfinitives.setInfinitive(i.id, i.selected)"/>
+      &nbsp;&nbsp;{{ i.name }}
+    </label>
+  </div>
+</div>
+
+<div class="col-md-12">
+  <button class="btn btn-primary" ng-if="userInfinitives.getPrev" ng-click="userInfinitives.getPrev()">Prev</button>
+  <button class="pull-right btn btn-primary" ng-if="userInfinitives.getNext" ng-click="userInfinitives.getNext()">Next</button>
+</div>

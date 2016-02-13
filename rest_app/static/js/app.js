@@ -49,15 +49,7 @@
         'content': {
           templateUrl: 'login.html',
           controller: 'LoginCtrl',
-          controllerAS: 'loginPage'
-        }
-      }
-    }).
-    state('app.verbs', {
-      url: '/verbs',
-      views: {
-        'content': {
-          templateUrl: 'verbs.html',
+          controllerAs: 'loginPage'
         }
       }
     }).
@@ -75,7 +67,26 @@
           return UserFactory.getTenses().$promise;
         }
       }
+    }).
+    state('app.infinitives', {
+      url: '/infinitives/?page',
+      views: {
+        'content': {
+          templateUrl: 'infinitives.html',
+          controller: 'UserInfinitivesController',
+          controllerAs: 'userInfinitives'
+        }
+      },
+      resolve: {
+        Infinitives: function(UserFactory, $stateParams) {
+          return UserFactory.getInfinitives({page: $stateParams.page}).$promise;
+        }
+      },
+      params: {
+        'page': '1',
+      }
     });
+
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/home');
   }]);
