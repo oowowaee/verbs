@@ -23,7 +23,7 @@ class GerundViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSet):
 
   def get_queryset(self):
     user = self.request.user
-    qs = Gerund.objects.select_related('infinitive').filter(infinitive__infinitive_users = user.id)
+    qs = Gerund.objects.select_related('infinitive')
     return qs
 
 
@@ -34,7 +34,7 @@ class PastparticipleViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSe
 
   def get_queryset(self):
     user = self.request.user
-    qs = Pastparticiple.objects.select_related('infinitive').filter(infinitive__infinitive_users = user.id)
+    qs = Pastparticiple.objects.select_related('infinitive')
     return qs
 
 

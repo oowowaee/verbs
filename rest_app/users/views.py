@@ -1,13 +1,16 @@
-from rest_framework import viewsets
+from django.db.models import Q
 
-from common.views import DefaultPagination, InfinitivePagination
 from .models import VerbUser
-from verbs.models import Tense, Infinitive
 from .serializers import *
+
+from common.utils import AnyNotNull
+from common.views import DefaultPagination, InfinitivePagination
+from verbs.models import Tense, Infinitive
+
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import viewsets, status
 import logging
 
 logger = logging.getLogger('verbs')
@@ -25,10 +28,14 @@ class UserViewSet(viewsets.ModelViewSet):
     #If this is a get request, pull all the tenses and annotate them with a boolean field indicating if
     #the currently logged in user has chosen this tense
     if request.method == 'GET':
-      queryset = Tense.objects.all()
+      queryset = Tense.objects.filter(
+                    Q(tense_users__isnull = True) |
+                    Q(tense_users__id = user_id)
+                    ).annotate(selected = AnyNotNull('tense_users__id')
+                    ).order_by('id')
 
       #TODO consider pagination or caching this?
-      serializer = UserTenseSerializer(queryset, many=True, tenses=[x.id for x in request.user.tenses.all().only('id')])
+      serializer = UserTenseSerializer(queryset, many=True)
       return Response(serializer.data)
     elif request.method == 'PATCH':
       #Otherwise, extract the id fields from the request data and set the currently logged in user's
@@ -48,16 +55,16 @@ class UserViewSet(viewsets.ModelViewSet):
   def infinitive(self, request, pk=None):
     obj = Infinitive.objects.filter(pk = pk)[0]
     if request.method == 'GET':
-      serializer = UserInfinitiveSerializer(obj, infinitives=[x.id for x in request.user.infinitives.filter(pk = pk).only('id')])
+      serializer = UserInfinitiveSerializer(obj)
     elif request.method == 'PATCH':
       if request.data['selected']:
         request.user.infinitives.add(obj)
         request.user.save
-        serializer = UserInfinitiveSerializer(obj, infinitives=[pk])
+        serializer = UserInfinitiveSerializer(obj)
       else:
         request.user.infinitives.remove(obj)
         request.user.save
-        serializer = UserInfinitiveSerializer(obj, infinitives=[])
+        serializer = UserInfinitiveSerializer(obj)
     return Response(serializer.data)
 
 
@@ -68,11 +75,14 @@ class UserViewSet(viewsets.ModelViewSet):
     #If this is a get request, pull all the infinitives and annotate them with a boolean field indicating if
     #the currently logged in user has chosen this infinitive
     if request.method == 'GET':
-      queryset = Infinitive.objects.all()
+      queryset = Infinitive.objects.filter(
+                    Q(infinitive_users__isnull = True) |
+                    Q(infinitive_users__id = user_id)
+                    ).annotate(selected = AnyNotNull('infinitive_users__id'))
 
       #We need to manually paginate this, as we're using a custom serializer
       page = self.paginate_queryset(queryset)
 
       #TODO consider pagination or caching this?
-      serializer = UserInfinitiveSerializer(page, many=True, infinitives=[x.id for x in request.user.infinitives.all().only('id')])
+      serializer = UserInfinitiveSerializer(page, many=True)
       return self.get_paginated_response(serializer.data)

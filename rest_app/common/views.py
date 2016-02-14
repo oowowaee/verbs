@@ -1,8 +1,10 @@
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import mixins, viewsets
+
+NUMBER_OF_QUESTIONS_TO_DISPLAY = 10
 
 class DefaultPagination(PageNumberPagination):
 	page_size = 20
@@ -26,12 +28,12 @@ class InfinitivePagination(DefaultPagination):
 
 class RandomViewMixin(object):
 	# For GET Requests
-	@list_route()
+	@list_route(permission_classes=[IsAuthenticated])
 	def random(self, request):
 		""" Adds a route to a viewset displaying a random list of objects """
 		pagination_class = DefaultQuestionPagination
 
-		qs = self.get_queryset().order_by('?')[:10]
+		qs = self.get_queryset().filter(infinitive__infinitive_users = request.user.id).order_by('?')[:NUMBER_OF_QUESTIONS_TO_DISPLAY]
 
 		serializer = self.get_serializer(qs, many=True)
 
@@ -40,5 +42,5 @@ class RandomViewMixin(object):
 
 class DefaultsMixin(object):
 	""" Default settings for view authentication, permissions, filtering and pagination. """
-	permission_classes = (IsAuthenticated,)
+	permission_classes = (IsAdminUser, )
 	pagination_class = DefaultPagination
