@@ -1,7 +1,6 @@
 (function() {
-  angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
-
-  .run(['$rootScope', function($rootScope) {
+  angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'ui-notification', 'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
+  .run(['$http', '$state', '$window', '$rootScope', 'UserFactory', function($http, $state, $window, $rootScope, UserFactory) {
     $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
       console.log('$stateChangeStart to '+toState.to+'- fired when the transition begins. toState,toParams : \n',toState, toParams);
     });
@@ -23,8 +22,37 @@
       console.log('$stateNotFound '+unfoundState.to+'  - fired when a state cannot be found by its name.');
       console.log(unfoundState, fromState, fromParams);
     });
+
+    /*
+      On route resolve, if the route is marked as requiring login check if the user is logged in, or if the auth token
+      exists in localStorage.  If it does, log the user in, otherwise redirect to the loginpage.
+     */
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams, options) {
+      if (UserFactory.user_information && !UserFactory.user_information.isLoggedIn && $window.localStorage.verb_app !== undefined) {
+        console.log($window.localStorage.verb_app);
+        UserFactory.loginUser($window.localStorage.verb_app.token);
+        angular.extend(UserFactory.user_information, $window.localStorage.verb_app.user);
+      } 
+
+      if (toState.requiresLogin && (!UserFactory.user_information || !UserFactory.user_information.isLoggedIn)) {
+        event.preventDefault();
+        $state.go('app.login');
+      }
+    });
   }])
-  .config(['$stateProvider', '$urlRouterProvider', '$resourceProvider', function($stateProvider, $urlRouterProvider, $resourceProvider) {
+
+  .config(['$stateProvider', '$urlRouterProvider', '$resourceProvider', 'NotificationProvider', function($stateProvider, $urlRouterProvider, $resourceProvider, NotificationProvider) {
+    NotificationProvider.setOptions({
+      delay: 4000,
+      startTop: 20,
+      startRight: 10,
+      verticalSpacing: 20,
+      horizontalSpacing: 20,
+      replaceMessage: true,
+      positionX: 'right',
+      positionY: 'bottom'
+    });
+
     $resourceProvider.defaults.stripTrailingSlashes = false;
 
     $stateProvider
@@ -32,11 +60,13 @@
       url: '',
       abstract: true,
       templateUrl: 'nav.html',
-      //controller: 'AppCtrl'
+      controller: 'AppCtrl',
+      controllerAs: 'UserCtrl'
     })
 
     .state('app.home', {
       url: '/home',
+      requiresLogin: false,
       views: {
         'content': {
           templateUrl: 'home.html',
@@ -45,11 +75,23 @@
     }).
     state('app.login', {
       url: '/login',
+      requiresLogin: false,
       views: {
         'content': {
           templateUrl: 'login.html',
           controller: 'LoginCtrl',
           controllerAs: 'loginPage'
+        }
+      }
+    }).
+    state('app.profile', {
+      url: '/profile',
+      requiresLogin: true,
+      views: {
+        'content': {
+          templateUrl: 'profile.html',
+          controller: 'ProfileCtrl',
+          controllerAs: 'profilePage'
         }
       }
     }).
@@ -62,6 +104,7 @@
           controllerAs: 'userTenses'
         }
       },
+      requiresLogin: true,
       resolve: {
         Tenses: function(UserFactory) {
           return UserFactory.getTenses().$promise;
@@ -70,6 +113,7 @@
     }).
     state('app.infinitives', {
       url: '/infinitives/?page',
+      requiresLogin: true,
       views: {
         'content': {
           templateUrl: 'infinitives.html',

@@ -87,7 +87,8 @@ DJOSER = {
   # 'SITE_NAME': 'Frontend',
   'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
   'ACTIVATION_URL': '#/activate/{uid}/{token}',
-  #'SEND_ACTIVATION_EMAIL': True,
+  'SEND_ACTIVATION_EMAIL': True,
+  'ALLOW_USERNAME_CHANGE': False,
 }
 
 REST_FRAMEWORK = {
@@ -96,6 +97,13 @@ REST_FRAMEWORK = {
     'rest_framework.authentication.TokenAuthentication',
   )
 }
+
+if DEBUG:
+    EMAIL_HOST = '127.0.0.1'
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
+    EMAIL_PORT = 1025
+    EMAIL_USE_TLS = False
 
 LOGGING = {
   'version': 1,

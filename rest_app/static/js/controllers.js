@@ -1,11 +1,25 @@
 (function() {
-  angular.module('verbs.controllers', ['ngMessages'])
+  angular.module('verbs.controllers', ['ngMessages', 'ui-notification'])
+          .controller('AppCtrl', AppCtrl)
           .controller('LoginCtrl', LoginCtrl)
+          .controller('ProfileCtrl', ProfileCtrl)
           .controller('UserTensesController', UserTensesController)
           .controller('UserInfinitivesController', UserInfinitivesController);
 
-  LoginCtrl.$inject = ['$http', '$state', 'UserFactory'];
-  function LoginCtrl($http, $state, UserFactory) {
+  AppCtrl.$inject = ['$state', '$scope', 'UserFactory'];
+  function AppCtrl($state, $scope, UserFactory) {
+    var vm = this;
+    vm.user = UserFactory.user_information;
+    vm.logout = logout;
+
+    function logout(form) {
+      UserFactory.logout();
+      $state.go('app.home');
+    }    
+  }
+
+  LoginCtrl.$inject = ['$state', 'UserFactory'];
+  function LoginCtrl($state, UserFactory) {
     var vm = this;
     vm.authorization = {
         username: '',
@@ -28,8 +42,27 @@
     }
   }
 
-  UserTensesController.$inject = ['Tenses', 'UserFactory'];
-  function UserTensesController(Tenses, UserFactory) {
+  ProfileCtrl.$inject = ['$state', 'UserFactory'];
+  function ProfileCtrl($state, UserFactory) {
+    var vm = this;
+    var user = UserFactory.user_information;
+    vm.save = save;
+    console.log(user);
+    vm.userDetails = {
+      email: user.email,
+      username: user.username,
+      vosotros: user.vosotros 
+    };  
+
+    function save() {
+      UserFactory.saveMe(vm.userDetails, function(response) {
+        Notification.success('Profile updated.');
+      });      
+    }
+  }
+
+  UserTensesController.$inject = ['Notification', 'Tenses', 'UserFactory'];
+  function UserTensesController(Notification, Tenses, UserFactory) {
     var vm = this;
     vm.tenses = Tenses;
     vm.totalTenses = Tenses.length;
@@ -37,13 +70,13 @@
 
     function save() {
       UserFactory.setTenses(vm.tenses, function(response) {
-        console.log(response);
+        Notification.success('Tenses updated.');
       });
     }
   }
 
-  UserInfinitivesController.$inject = ['Infinitives', 'UserFactory', '$state', '$stateParams'];
-  function UserInfinitivesController(Infinitives, UserFactory, $state, $stateParams) {
+  UserInfinitivesController.$inject = ['Infinitives', 'Notification', 'UserFactory', '$state', '$stateParams'];
+  function UserInfinitivesController(Infinitives, Notification, UserFactory, $state, $stateParams) {
     var vm = this;
     vm.infinitives = Infinitives.results;
     vm.totalInfinitives = vm.infinitives.length;
@@ -61,7 +94,7 @@
     }
 
     function setInfinitive(pk, selected) {
-      console.log(selected);
+      Notification.success('Infinitive updated.');
       UserFactory.setInfinitive({pk: pk, selected: selected});
     }
   }

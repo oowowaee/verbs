@@ -13,16 +13,25 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li class="active"><a href="#">Home</a></li>
-        <li><a href="#about">Practice</a></li>
-        <li><a href="#contact">History</a></li>
+        <li uib-dropdown ng-show="UserCtrl.user.isLoggedIn">
+          <a href="#" uib-dropdown-toggle role="button">Practice <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a>Conjugations</a></li>
+            <li><a>Gerunds</a></li>
+            <li><a>Participles</a></li>
+            <li><a>Drill</a></li>
+          </ul>
+        </li>
+        <li ng-show="UserCtrl.user.isLoggedIn"><a href="#contact">History</a></li>
         <li uib-dropdown>
           <a href="#" uib-dropdown-toggle role="button" aria-haspopup="true" aria-expanded="false">User <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a ui-sref="app.login">Login</a></li>
-            <li><a href="#">Logout</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a ui-sref="app.tenses">Set Tenses</a></li>
-            <li><a ui-sref="app.infinitives">Set Verbs</a></li>
+            <li ng-show="!UserCtrl.user.isLoggedIn"><a ui-sref="app.login">Login</a></li>
+            <li ng-show="UserCtrl.user.isLoggedIn"><a ui-sref="app.profile">Profile</a></li>
+            <li ng-show="UserCtrl.user.isLoggedIn"><a ng-click="UserCtrl.logout()" href="#">Logout</a></li>
+            <li ng-show="UserCtrl.user.isLoggedIn" role="separator" class="divider"></li>
+            <li ng-show="UserCtrl.user.isLoggedIn"><a ui-sref="app.tenses">Set Tenses</a></li>
+            <li ng-show="UserCtrl.user.isLoggedIn"><a ui-sref="app.infinitives">Set Verbs</a></li>
           </ul>
         </li>
       </ul>

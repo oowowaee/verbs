@@ -17,8 +17,9 @@ gulp.task('sass', function () {
         .pipe(sass({
             style: 'compressed',
             includePaths: [
-                'static/vendors/components-font-awesome/scss',
-                'static/vendors/bootstrap-sass/assets/stylesheets'
+              'static/vendors/components-font-awesome/scss',
+              'static/vendors/bootstrap-sass/assets/stylesheets',
+              'static/vendors/angular-ui-notification/dist'
             ]
         }))
         .pipe(gulp.dest('static/dist/css'));
@@ -50,6 +51,8 @@ gulp.task('templates', function () {
 gulp.task('watch', ['sass', 'vendors', 'js'], function() {
   gulp.watch('static/scss/*.scss', ['sass']);
   gulp.watch('static/js/*.js', ['js']);
+  gulp.watch('../ionic_app/www/js/constants.js', ['js']);
+  gulp.watch('../ionic_app/www/js/factories.js', ['js']);
   gulp.watch('static/templates/*.html', ['js']);
 });
 

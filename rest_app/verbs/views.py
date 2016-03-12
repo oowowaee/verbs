@@ -17,28 +17,26 @@ class ConjugationViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSet):
 
 
 class GerundViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSet):
-  """API endpoint for listing infinitives."""
+  """API endpoint for listing gerunds."""
   queryset = Gerund.objects.all()
   serializer_class = GerundSerializer
 
   def get_queryset(self):
-    user = self.request.user
     qs = Gerund.objects.select_related('infinitive')
     return qs
 
 
 class PastparticipleViewSet(DefaultsMixin, RandomViewMixin, viewsets.ModelViewSet):
-  """API endpoint for listing infinitives."""
-  serializer_class = PastparticipleSerializer
+  """API endpoint for listing past participles."""
   queryset = Pastparticiple.objects.all()
+  serializer_class = PastparticipleSerializer
 
   def get_queryset(self):
-    user = self.request.user
     qs = Pastparticiple.objects.select_related('infinitive')
     return qs
 
 
 class TenseViewSet(DefaultsMixin, ListOrUpdateViewSet):
-  """API endpoint for listing infinitives."""
+  """API endpoint for listing verb tenses."""
   queryset = Tense.objects.all()
   serializer_class = TenseSerializer

@@ -1,33 +1,65 @@
 (function() {
-  angular.module('verbs.factories', ['ngResource'])
+  angular.module('verbs.factories', ['ngResource', 'ui-notification'])
         .factory('UserFactory', UserFactory)
         .factory('RandomEndPointFactory', RandomEndPointFactory)
         .factory('ConjugationFactory', ConjugationFactory)
         .factory('GerundFactory', GerundFactory)
         .factory('ParticipleFactory', ParticipleFactory);
 
-   UserFactory.$inject = ['$http', '$resource', '$window', 'DOMAIN'];
-   function UserFactory($http, $resource, $window, DOMAIN) {
+  UserFactory.$inject = ['$http', '$resource', '$window', 'DOMAIN', 'Notification'];
+  function UserFactory($http, $resource, $window, DOMAIN, Notification) {
     var User = $resource(DOMAIN + '/api/auth/',
       null,
       {
         'login': {url: DOMAIN + '/api/auth/login/', method: 'POST', interceptor: loginInterceptor()},
         'logout': {url: DOMAIN + '/api/auth/logout/', method: 'POST', interceptor: logoutInterceptor()},
+        'me': {url: DOMAIN + '/api/auth/me/', method: 'GET', interceptor: userInterceptor()},
+        'saveMe': {url: DOMAIN + '/api/auth/me/', method: 'PUT', interceptor: userInterceptor()},
         'getTenses': {url: DOMAIN + '/api/user/tenses/', method: 'GET', isArray: true},
         'setTenses': {url: DOMAIN + '/api/user/tenses/', method: 'PATCH'},
         'getInfinitives': {url: DOMAIN + '/api/user/infinitives/?page=:page', params: {page: '@page'}, method: 'GET'},
         'setInfinitive': {url: DOMAIN + '/api/user/infinitive/:pk', params: {pk: '@pk'}, method: 'PATCH'},
       }
     );
-    User.loggedIn = false;
+    User.user_information = {isLoggedIn: false};
+    User.loginUser = loginUser;
+    User.logoutUser = logoutUser;
     return User;
+
+    /*
+      If the authtoken is set, mark the user as logged in and try to save the token to localstorage.  Pull the user information if it doesn't exist. 
+     */
+    function loginUser(token) {
+      if (token !== undefined) {
+        User.user_information.isLoggedIn = true;
+        $http.defaults.headers.common.Authorization = 'Token ' + token;
+        $window.localStorage.verb_app = {};
+        $window.localStorage.verb_app.token = token;
+        if (User.user_information.username === undefined) {
+          User.me();
+        }
+      }
+    }
+
+    function logoutUser() {
+      User.user_information.isLoggedIn = false;
+      $http.defaults.headers.common.Authorization = undefined;
+      $window.localStorage.removeItem('verb_app');
+    }
+
+    function updateUserInformation(data) {
+      console.log(data);
+      angular.extend(User.user_information, data);
+      console.log(User.user_information);
+      console.log($window.localStorage.verb_app.token);
+      $window.localStorage.verb_app.user_information = data;
+    }
 
     function loginInterceptor() {
       return {
         response: function (response) {
-          User.loggedIn = true;
-          $http.defaults.headers.common.Authorization = 'Token ' + response.data.auth_token;
-          $window.localStorage.token = response.data.auth_token;
+          Notification.success('You are now logged in.');
+          loginUser(response.data.auth_token);
         },
         responseError: function (data) {
         }
@@ -37,13 +69,22 @@
     function logoutInterceptor() {
       return {
         response: function (data) {
-          User.loggedIn = false;
-          $http.defaults.headers.common.Authorization = undefined;
-          $window.localStorage.token = undefined;
+          Notification.success('You are now logged out.');
+          logoutUser();
         },
         responseError: function (data) {
         }
       };
+    }
+
+    function userInterceptor() {
+      return {
+        response: function (response) {
+          updateUserInformation(response.data);
+        },
+        responseError: function (data) {
+        }
+      };      
     }
   }
 

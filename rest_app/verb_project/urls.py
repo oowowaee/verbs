@@ -15,7 +15,7 @@ router.register(r'user', userviews.UserViewSet, base_name='user')
 
 urlpatterns = [
 	url(r'^api/auth/', include('djoser.urls.authtoken')),
-	url(r'^api/user/infinitive/(?P<pk>[0-9]+)$', userviews.UserViewSet.as_view({'patch': 'infinitive'})),
+	url(r'^api/user/infinitive/(?P<infinitive_pk>[0-9]+)$', userviews.UserViewSet.as_view({'patch': 'infinitive'})),
 	url(r'^$', TemplateView.as_view(template_name='index.html'), name="home"),
 	url(r'^api/', include(router.urls)),
 ]

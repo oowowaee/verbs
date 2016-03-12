@@ -34,7 +34,6 @@ class UserViewSet(viewsets.ModelViewSet):
                     ).annotate(selected = AnyNotNull('tense_users__id')
                     ).order_by('id')
 
-      #TODO consider pagination or caching this?
       serializer = UserTenseSerializer(queryset, many=True)
       return Response(serializer.data)
     elif request.method == 'PATCH':
@@ -51,20 +50,18 @@ class UserViewSet(viewsets.ModelViewSet):
       return Response(status=response_code)
 
 
+  #TODO: Test this route without a pk
   @list_route(methods=['get', 'patch'])
-  def infinitive(self, request, pk=None):
-    obj = Infinitive.objects.filter(pk = pk)[0]
-    if request.method == 'GET':
-      serializer = UserInfinitiveSerializer(obj)
-    elif request.method == 'PATCH':
+  def infinitive(self, request, infinitive_pk=None):
+    obj = Infinitive.objects.filter(pk = infinitive_pk)[0]
+    if request.method == 'PATCH':
       if request.data['selected']:
         request.user.infinitives.add(obj)
-        request.user.save
-        serializer = UserInfinitiveSerializer(obj)
       else:
         request.user.infinitives.remove(obj)
-        request.user.save
-        serializer = UserInfinitiveSerializer(obj)
+      request.user.save
+
+    serializer = UserInfinitiveSerializer(obj)
     return Response(serializer.data)
 
 
@@ -83,6 +80,5 @@ class UserViewSet(viewsets.ModelViewSet):
       #We need to manually paginate this, as we're using a custom serializer
       page = self.paginate_queryset(queryset)
 
-      #TODO consider pagination or caching this?
       serializer = UserInfinitiveSerializer(page, many=True)
       return self.get_paginated_response(serializer.data)

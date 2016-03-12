@@ -10,6 +10,8 @@ class VerbUser(AbstractUser):
   infinitives = models.ManyToManyField('verbs.Infinitive', related_query_name='infinitive_users')
   tenses = models.ManyToManyField('verbs.Tense', related_query_name='tense_users')
 
+  REQUIRED_FIELDS = ['vosotros', 'email']
+
   def save(self, *args, **kwargs):
   	pk = self.pk
   	super(VerbUser, self).save(*args, **kwargs)
