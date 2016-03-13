@@ -102,6 +102,26 @@
         }
       }
     }).
+    state('app.register', {
+      url: '/register',
+      views: {
+        'content': {
+          templateUrl: 'register.html',
+          controller: 'RegistrationCtrl',
+          controllerAs: 'registrationPage'
+        }
+      }
+    }).
+    state('app.activate', {
+      url: '/activate/:uid/:token',
+      views: {
+        'content': {
+          templateUrl: 'activate.html',
+          controller: 'ActivationCtrl',
+          controllerAs: 'activationPage'
+        }
+      }
+    }).
     state('app.tenses', {
       url: '/tenses',
       views: {
@@ -146,6 +166,8 @@
   angular.module('verbs.controllers', ['ngMessages', 'ui-notification'])
           .controller('AppCtrl', AppCtrl)
           .controller('LoginCtrl', LoginCtrl)
+          .controller('RegistrationCtrl', RegistrationCtrl)
+          .controller('ActivationCtrl', ActivationCtrl)
           .controller('ProfileCtrl', ProfileCtrl)
           .controller('UserTensesController', UserTensesController)
           .controller('UserInfinitivesController', UserInfinitivesController);
@@ -177,21 +199,22 @@
       if(form.$valid) {
         UserFactory.login({
           'username': vm.authorization.username,
-          'password': vm.authorization.password}, function(response) {
+          'password': vm.authorization.password}, 
+          function(response) {
             $state.go('app.home');
           }, function(error) {
             vm.invalidLogin = true;
-          });
+          }
+        );
       }
     }
   }
 
-  ProfileCtrl.$inject = ['$state', 'UserFactory'];
-  function ProfileCtrl($state, UserFactory) {
+  ProfileCtrl.$inject = ['$state', 'UserFactory', 'Notification'];
+  function ProfileCtrl($state, UserFactory, Notification) {
     var vm = this;
     var user = UserFactory.user_information;
     vm.submit = submit;
-    console.log(user);
     vm.userDetails = {
       email: user.email,
       username: user.username,
@@ -199,9 +222,45 @@
     };  
 
     function submit(form) {
-      UserFactory.saveMe(vm.userDetails, function(response) {
-        Notification.success('Profile updated.');
-      });      
+      if (form.$valid) {
+        UserFactory.saveMe(vm.userDetails, 
+          function(response) {
+            Notification.success('Profile updated.');
+          }, function(error) {
+            Notification.error('Unable to update profile.');        
+          }
+        );      
+      }
+    }
+  }
+
+  ActivationCtrl.$inject = ['$state', '$stateParams', 'UserFactory', 'Notification'];
+  function ActivationCtrl($state, $stateParams, UserFactory, Notification) {
+    var vm = this;
+
+    UserFactory.activate({uid: $stateParams.uid, token: $stateParams.token},
+      function(response) {
+        $state.go('app.login');
+      }, function(error) {
+        Notification.error('Unable to activate account.');        
+      }
+    );
+  }
+
+  RegistrationCtrl.$inject = ['$state', 'UserFactory', 'Notification'];
+  function RegistrationCtrl($state, UserFactory, Notification) {
+    var vm = this;
+    vm.submit = submit;
+    vm.userDetails = {};  
+
+    function submit(form) {
+      if (form.$valid) {
+        UserFactory.register(vm.userDetails, function(response) {
+          Notification.success('Account created.');
+        }, function(error) {
+          Notification.error('Unable to create account.');        
+        });      
+      }
     }
   }
 
@@ -213,9 +272,13 @@
     vm.save = save;
 
     function save() {
-      UserFactory.setTenses(vm.tenses, function(response) {
-        Notification.success('Tenses updated.');
-      });
+      UserFactory.setTenses(vm.tenses, 
+        function(response) {
+          Notification.success('Tenses updated.');
+        }, function(error) {
+          Notification.error('Unable to update tenses.');          
+        }
+      );
     }
   }
 
@@ -238,8 +301,13 @@
     }
 
     function setInfinitive(pk, selected) {
-      Notification.success('Infinitive updated.');
-      UserFactory.setInfinitive({pk: pk, selected: selected});
+      UserFactory.setInfinitive({pk: pk, selected: selected},
+        function(response) {
+           Notification.success('Infinitive updated.');
+         }, function(error) {
+           Notification.error('Unable to update infinitive.');
+         }
+      );
     }
   }
 })();
@@ -261,12 +329,14 @@
 	});
 })();
 
-(function(){angular.module("templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("errors.html","<script id=\"error-list.html\" type=\"text/ng-template\">  \n  <div class=\"error\" ng-message=\"required\">\n    <i class=\"ion-information-circled\"></i> \n    This field is required!\n  </div>\n  <div class=\"error\" ng-message=\"minlength\">\n    <i class=\"ion-information-circled\"></i> \n    Minimum length of this field is 5 characters!\n  </div>\n  <div class=\"error\" ng-message=\"maxlength\">\n    <i class=\"ion-information-circled\"></i> \n    Maximum length of this field is 20 characters!\n  </div>\n</script>   \n");
+(function(){angular.module("templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("activate.html","<br/>\n<br />\nActivating account");
+$templateCache.put("errors.html","<script id=\"error-list.html\" type=\"text/ng-template\">  \n  <div class=\"error\" ng-message=\"required\">\n    <i class=\"ion-information-circled\"></i> \n    This field is required!\n  </div>\n  <div class=\"error\" ng-message=\"minlength\">\n    <i class=\"ion-information-circled\"></i> \n    Minimum length of this field is 5 characters!\n  </div>\n  <div class=\"error\" ng-message=\"maxlength\">\n    <i class=\"ion-information-circled\"></i> \n    Maximum length of this field is 20 characters!\n  </div>\n</script>   \n");
 $templateCache.put("home.html","<div class=\"jumbotron\">\n	<h1>Navbar example</h1>\n	<p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>\n	<p>To see the difference between static and fixed top navbars, just scroll.</p>\n	<p>\n	  <a class=\"btn btn-lg btn-primary\" href=\"../../components/#navbar\" role=\"button\">View navbar docs &raquo;</a>\n	</p>\n</div>");
 $templateCache.put("infinitives.html","<h3>Set Infinitives</h3>\n\n<div class=\"col-md-4\">\n  <div class=\"checkbox\" ng-repeat=\"i in userInfinitives.infinitives | slice:0:userInfinitives.thirdOfResults track by i.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"i.selected\" ng-change=\"userInfinitives.setInfinitive(i.id, i.selected)\"/>\n      &nbsp;&nbsp;{{ i.name }}\n    </label>\n  </div>\n</div>\n<div class=\"col-md-4\">\n  <div class=\"checkbox\" ng-repeat=\"i in userInfinitives.infinitives | slice:userInfinitives.thirdOfResults:userInfinitives.thirdOfResults*2 track by i.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"i.selected\" ng-change=\"userInfinitives.setInfinitive(i.id, i.selected)\"/>\n      &nbsp;&nbsp;{{ i.name }}\n    </label>\n  </div>\n</div>\n<div class=\"col-md-4\">\n  <div class=\"checkbox\" ng-repeat=\"i in userInfinitives.infinitives | slice:userInfinitives.thirdOfResults*2:userInfinitives.totalInfinitives track by i.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"i.selected\" ng-change=\"userInfinitives.setInfinitive(i.id, i.selected)\"/>\n      &nbsp;&nbsp;{{ i.name }}\n    </label>\n  </div>\n</div>\n\n<div class=\"col-md-12\">\n  <button class=\"btn btn-primary\" ng-if=\"userInfinitives.getPrev\" ng-click=\"userInfinitives.getPrev()\">Prev</button>\n  <button class=\"pull-right btn btn-primary\" ng-if=\"userInfinitives.getNext\" ng-click=\"userInfinitives.getNext()\">Next</button>\n</div>");
 $templateCache.put("login.html","<br/>\n<br />\n<form name=\"loginForm\" class=\"form-horizontal col-md-8 col-md-offset-2\" novalidate ng-submit=\"loginPage.login(loginForm)\">\n  <div class=\"text-center\" ng-show=\"loginPage.invalidLogin\">\n    <div class=\"alert alert-danger\">\n      We were unable to log you in with the provided credentials.\n    </div>\n    <br />\n  </div>\n  <div class=\"form-group\">\n    <label for=\"username\" class=\"col-sm-2 control-label\" ng-class=\"{\'has-errors\': loginForm.username.$invalid && loginForm.$submitted, \'no-errors\': loginForm.username.$valid}\">\n      Username\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"username\" class=\"form-control\" type=\"text\" name=\"username\" ng-model=\"loginPage.authorization.username\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>     \n    <div class=\"error-container\" ng-show=\"loginForm.username.$error\" ng-messages=\"loginForm.username.$error\">\n      <div ng-messages-include=\"errors.html\"></div>\n    </div>\n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"password\" class=\"col-sm-2 control-label\" ng-class=\"{\'has-errors\': loginForm.password.$invalid && loginForm.$submitted, \'no-errors\': loginForm.password.$valid}\">\n      Password\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"password\" class=\"form-control\" type=\"password\" name=\"password\" ng-model=\"loginPage.authorization.password\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"error-container last-error-container\" ng-show=\"loginForm.password.$error && loginForm.$submitted\" ng-messages=\"loginForm.password.$error\">\n      <div ng-messages-include=\"errors.html\"></div> \n    </div>      \n  </div>    \n\n  <br />\n  <br />\n\n  <div class=\"text-center\">\n    <button class=\"btn btn-primary\" type=\"submit\">\n      Sign In\n    </button>\n  </div>\n</form>");
-$templateCache.put("nav.html","<!-- Static navbar -->\n<nav class=\"navbar navbar-default navbar-static-top\">\n  <div class=\"container\">\n    <div class=\"navbar-header\">\n      <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#navbar\" aria-expanded=\"false\" aria-controls=\"navbar\">\n        <span class=\"sr-only\">Toggle navigation</span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n      </button>\n      <a class=\"navbar-brand\" href=\"#\">Verbs</a>\n    </div>\n    <div id=\"navbar\" class=\"navbar-collapse collapse\">\n      <ul class=\"nav navbar-nav navbar-right\">\n        <li class=\"active\"><a href=\"#\">Home</a></li>\n        <li uib-dropdown ng-show=\"UserCtrl.user.isLoggedIn\">\n          <a href=\"#\" uib-dropdown-toggle role=\"button\">Practice <span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\">\n            <li><a>Conjugations</a></li>\n            <li><a>Gerunds</a></li>\n            <li><a>Participles</a></li>\n            <li><a>Drill</a></li>\n          </ul>\n        </li>\n        <li ng-show=\"UserCtrl.user.isLoggedIn\"><a href=\"#contact\">History</a></li>\n        <li uib-dropdown>\n          <a href=\"#\" uib-dropdown-toggle role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">User <span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\">\n            <li ng-show=\"!UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.login\">Login</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.profile\">Profile</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ng-click=\"UserCtrl.logout()\" href=\"#\">Logout</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\" role=\"separator\" class=\"divider\"></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.tenses\">Set Tenses</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.infinitives\">Set Verbs</a></li>\n          </ul>\n        </li>\n      </ul>\n    </div><!--/.nav-collapse -->\n  </div>\n</nav>\n\n<div class=\"container\">\n  <!-- Main component for a primary marketing message or call to action -->\n  <div ui-view=\"content\"></div>\n</div> <!-- /container -->");
-$templateCache.put("profile.html","<br/>\n<br />\n<form name=\"profileForm\" class=\"form-horizontal col-md-8 col-md-offset-2\" novalidate ng-submit=\"profilePage.submit(profileForm)\">\n  <div class=\"form-group\">\n    <div class=\"checkbox pull-right\">\n      <label>\n        <input type=\"checkbox\" ng-model=\"profilePage.userDetails.vosotros\" />\n        &nbsp;&nbsp;Vosotros\n      </label>\n    </div>\n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"username\" class=\"col-sm-2 control-label\">\n      Username\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"username\" disabled class=\"form-control\" type=\"text\" ng-model=\"profilePage.userDetails.username\">\n    </div>     \n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"email\" class=\"col-sm-2 control-label\" ng-class=\"{\'has-errors\': profileForm.email.$invalid && profileForm.$submitted, \'no-errors\': profileForm.email.$valid}\">\n      Email\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"email\" class=\"form-control\" type=\"email\" name=\"email\" ng-model=\"profilePage.userDetails.email\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"error-container last-error-container\" ng-show=\"profileForm.password.$error && profileForm.$submitted\" ng-messages=\"profileForm.password.$error\">\n      <div ng-messages-include=\"errors.html\"></div> \n    </div>      \n  </div>    \n\n  <br />\n  <br />\n\n  <div class=\"text-center\">\n    <button class=\"btn btn-primary\" type=\"submit\">\n      Save\n    </button>\n  </div>\n</form>");
+$templateCache.put("nav.html","<!-- Static navbar -->\n<nav class=\"navbar navbar-default navbar-static-top\">\n  <div class=\"container\">\n    <div class=\"navbar-header\">\n      <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#navbar\" aria-expanded=\"false\" aria-controls=\"navbar\">\n        <span class=\"sr-only\">Toggle navigation</span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n      </button>\n      <a class=\"navbar-brand\" href=\"#\">Verbs</a>\n    </div>\n    <div id=\"navbar\" class=\"navbar-collapse collapse\">\n      <ul class=\"nav navbar-nav navbar-right\">\n        <li class=\"active\"><a href=\"#\">Home</a></li>\n        <li uib-dropdown ng-show=\"UserCtrl.user.isLoggedIn\">\n          <a href=\"#\" uib-dropdown-toggle role=\"button\">Practice <span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\">\n            <li><a>Conjugations</a></li>\n            <li><a>Gerunds</a></li>\n            <li><a>Participles</a></li>\n            <li><a>Drill</a></li>\n          </ul>\n        </li>\n        <li ng-show=\"UserCtrl.user.isLoggedIn\"><a href=\"#contact\">History</a></li>\n        <li uib-dropdown>\n          <a href=\"#\" uib-dropdown-toggle role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">User <span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\">\n            <li ng-show=\"!UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.login\">Login</a></li>\n            <li ng-show=\"!UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.register\">Register</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.profile\">Profile</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ng-click=\"UserCtrl.logout()\" href=\"#\">Logout</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\" role=\"separator\" class=\"divider\"></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.tenses\">Set Tenses</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.infinitives\">Set Verbs</a></li>\n          </ul>\n        </li>\n      </ul>\n    </div><!--/.nav-collapse -->\n  </div>\n</nav>\n\n<div class=\"container\">\n  <!-- Main component for a primary marketing message or call to action -->\n  <div ui-view=\"content\"></div>\n</div> <!-- /container -->");
+$templateCache.put("profile.html","<br/>\n<br />\n<form name=\"profileForm\" class=\"form-horizontal col-md-8 col-md-offset-2\" novalidate ng-submit=\"profilePage.submit(profileForm)\">\n  <div class=\"form-group\">\n    <div class=\"checkbox pull-right\">\n      <label>\n        <input type=\"checkbox\" ng-model=\"profilePage.userDetails.vosotros\" />\n        &nbsp;&nbsp;Vosotros\n      </label>\n    </div>\n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"username\" class=\"col-sm-2 control-label\">\n      Username\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"username\" disabled class=\"form-control\" type=\"text\" ng-model=\"profilePage.userDetails.username\">\n    </div>     \n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"email\" class=\"col-sm-2 control-label\">\n      Email\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"email\" class=\"form-control\" type=\"email\" name=\"email\" ng-model=\"profilePage.userDetails.email\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"profileForm.email.$touched || profileForm.$submitted\" ng-messages=\"profileForm.email.$error\">\n      <span ng-message=\"email\">\n        A valid email is required!\n      </span>\n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>    \n\n  <br />\n  <br />\n\n  <div class=\"text-center\">\n    <button class=\"btn btn-primary\" type=\"submit\">\n      Save\n    </button>\n  </div>\n</form>");
+$templateCache.put("register.html","<br/>\n<br />\n<form name=\"registrationForm\" class=\"form-horizontal col-md-8 col-md-offset-2\" novalidate ng-submit=\"registrationPage.submit(registrationForm)\">\n  <div class=\"form-group\">\n    <label for=\"username\" class=\"col-sm-2 control-label\">\n      Username\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"username\" type=\"text\" name=\"username\" class=\"form-control\" type=\"text\" ng-model=\"registrationPage.userDetails.username\">\n    </div>     \n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"registrationForm.username.$touched || registrationForm.$submitted\" ng-messages=\"registrationForm.username.$error\">    \n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"email\" class=\"col-sm-2 control-label\">\n      Email\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"email\" class=\"form-control\" type=\"email\" name=\"email\" ng-model=\"registrationPage.userDetails.email\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"registrationForm.email.$touched || registrationForm.$submitted\" ng-messages=\"registrationForm.email.$error\">\n      <span ng-message=\"email\">\n        A valid email is required!\n      </span>\n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>    \n\n  <div class=\"form-group\">\n    <label for=\"password\" class=\"col-sm-2 control-label\">\n      Password\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"password\" class=\"form-control\" type=\"password\" name=\"password\" ng-model=\"registrationPage.userDetails.password\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"registrationForm.password.$touched || registrationForm.$submitted\" ng-messages=\"registrationForm.password.$error\">\n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>    \n\n  <div class=\"form-group\">\n    <label for=\"password_confirmation\" class=\"col-sm-2 control-label\">\n      Confirm Password\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"password_confirmation\" class=\"form-control\" type=\"password\" name=\"password_confirmation\" ng-model=\"registrationPage.userDetails.password_confirmation\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"registrationForm.password_confirmation.$touched || registrationForm.$submitted\" ng-messages=\"registrationForm.password_confirmation.$error\">    \n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>    \n\n  <br />\n  <br />\n\n  <div class=\"text-center\">\n    <button class=\"btn btn-primary\" type=\"submit\">\n      Save\n    </button>\n  </div>\n</form>");
 $templateCache.put("tenses.html","<h3>Set Tenses</h3>\n\n<div class=\"col-md-6\">\n  <div class=\"checkbox\" ng-repeat=\"t in userTenses.tenses | slice:0:userTenses.totalTenses/2 track by t.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"t.selected\" />\n      &nbsp;&nbsp;{{ t.translation }}\n    </label>\n  </div>\n</div>\n<div class=\"col-md-6\">\n  <div class=\"checkbox\" ng-repeat=\"t in userTenses.tenses | slice:userTenses.totalTenses/2:userTenses.totalTenses track by t.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"t.selected\" />\n      &nbsp;&nbsp;{{ t.translation }}\n    </label>\n  </div>\n</div>\n\n<div class=\"text-center\">\n  <button class=\"btn btn-primary\" ng-click=\"userTenses.save()\">Save</button>\n</div>");}]);})();
 angular.module('verbs.constants', [])
 
@@ -286,6 +356,8 @@ angular.module('verbs.constants', [])
       {
         'login': {url: DOMAIN + '/api/auth/login/', method: 'POST', interceptor: loginInterceptor()},
         'logout': {url: DOMAIN + '/api/auth/logout/', method: 'POST', interceptor: logoutInterceptor()},
+        'activate': {url: DOMAIN + '/api/auth/activate/', method: 'POST'},
+        'register': {url: DOMAIN + '/api/auth/register/', method: 'POST'},
         'me': {url: DOMAIN + '/api/auth/me/', method: 'GET', interceptor: userInterceptor()},
         'saveMe': {url: DOMAIN + '/api/auth/me/', method: 'PUT', interceptor: userInterceptor()},
         'getTenses': {url: DOMAIN + '/api/user/tenses/', method: 'GET', isArray: true},

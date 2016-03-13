@@ -2,10 +2,8 @@
 @import "font-awesome";
 @import "angular-ui-notification";
 
-.test {
-	width: 100%;
-}
-
-.test2 {
-	width: 100%;
+.error-message {
+	border-left: 3px solid $brand-danger;
+	margin-top: 5px;
+	min-height: 0px;
 }

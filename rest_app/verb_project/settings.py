@@ -88,6 +88,7 @@ DJOSER = {
   'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
   'ACTIVATION_URL': '#/activate/{uid}/{token}',
   'SEND_ACTIVATION_EMAIL': True,
+  'ALLOW_USERNAME_CHANGE': False,
 }
 
 REST_FRAMEWORK = {

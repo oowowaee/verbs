@@ -1,0 +1,71 @@
+<br/>
+<br />
+<form name="registrationForm" class="form-horizontal col-md-8 col-md-offset-2" novalidate ng-submit="registrationPage.submit(registrationForm)">
+  <div class="form-group">
+    <label for="username" class="col-sm-2 control-label">
+      Username
+    </label>
+    <div class="col-sm-10">
+      <input id="username" type="text" name="username" class="form-control" type="text" ng-model="registrationPage.userDetails.username">
+    </div>     
+    <div class="col-sm-10 pull-right error-message" ng-show="registrationForm.username.$touched || registrationForm.$submitted" ng-messages="registrationForm.username.$error">    
+      <span ng-message="required">
+        This field is required!
+      </span>    
+    </div>      
+  </div>
+
+  <div class="form-group">
+    <label for="email" class="col-sm-2 control-label">
+      Email
+    </label>
+    <div class="col-sm-10">
+      <input id="email" class="form-control" type="email" name="email" ng-model="registrationPage.userDetails.email" ng-minlength="5" ng-maxlength="20" required>
+    </div>
+    <div class="col-sm-10 pull-right error-message" ng-show="registrationForm.email.$touched || registrationForm.$submitted" ng-messages="registrationForm.email.$error">
+      <span ng-message="email">
+        A valid email is required!
+      </span>
+      <span ng-message="required">
+        This field is required!
+      </span>    
+    </div>      
+  </div>    
+
+  <div class="form-group">
+    <label for="password" class="col-sm-2 control-label">
+      Password
+    </label>
+    <div class="col-sm-10">
+      <input id="password" class="form-control" type="password" name="password" ng-model="registrationPage.userDetails.password" ng-minlength="5" ng-maxlength="20" required>
+    </div>
+    <div class="col-sm-10 pull-right error-message" ng-show="registrationForm.password.$touched || registrationForm.$submitted" ng-messages="registrationForm.password.$error">
+      <span ng-message="required">
+        This field is required!
+      </span>    
+    </div>      
+  </div>    
+
+  <div class="form-group">
+    <label for="password_confirmation" class="col-sm-2 control-label">
+      Confirm Password
+    </label>
+    <div class="col-sm-10">
+      <input id="password_confirmation" class="form-control" type="password" name="password_confirmation" ng-model="registrationPage.userDetails.password_confirmation" ng-minlength="5" ng-maxlength="20" required>
+    </div>
+    <div class="col-sm-10 pull-right error-message" ng-show="registrationForm.password_confirmation.$touched || registrationForm.$submitted" ng-messages="registrationForm.password_confirmation.$error">    
+      <span ng-message="required">
+        This field is required!
+      </span>    
+    </div>      
+  </div>    
+
+  <br />
+  <br />
+
+  <div class="text-center">
+    <button class="btn btn-primary" type="submit">
+      Save
+    </button>
+  </div>
+</form>

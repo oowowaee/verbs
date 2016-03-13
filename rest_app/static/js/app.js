@@ -102,6 +102,26 @@
         }
       }
     }).
+    state('app.register', {
+      url: '/register',
+      views: {
+        'content': {
+          templateUrl: 'register.html',
+          controller: 'RegistrationCtrl',
+          controllerAs: 'registrationPage'
+        }
+      }
+    }).
+    state('app.activate', {
+      url: '/activate/:uid/:token',
+      views: {
+        'content': {
+          templateUrl: 'activate.html',
+          controller: 'ActivationCtrl',
+          controllerAs: 'activationPage'
+        }
+      }
+    }).
     state('app.tenses', {
       url: '/tenses',
       views: {

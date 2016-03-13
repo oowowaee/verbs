@@ -2,6 +2,8 @@
   angular.module('verbs.controllers', ['ngMessages', 'ui-notification'])
           .controller('AppCtrl', AppCtrl)
           .controller('LoginCtrl', LoginCtrl)
+          .controller('RegistrationCtrl', RegistrationCtrl)
+          .controller('ActivationCtrl', ActivationCtrl)
           .controller('ProfileCtrl', ProfileCtrl)
           .controller('UserTensesController', UserTensesController)
           .controller('UserInfinitivesController', UserInfinitivesController);
@@ -33,21 +35,22 @@
       if(form.$valid) {
         UserFactory.login({
           'username': vm.authorization.username,
-          'password': vm.authorization.password}, function(response) {
+          'password': vm.authorization.password}, 
+          function(response) {
             $state.go('app.home');
           }, function(error) {
             vm.invalidLogin = true;
-          });
+          }
+        );
       }
     }
   }
 
-  ProfileCtrl.$inject = ['$state', 'UserFactory'];
-  function ProfileCtrl($state, UserFactory) {
+  ProfileCtrl.$inject = ['$state', 'UserFactory', 'Notification'];
+  function ProfileCtrl($state, UserFactory, Notification) {
     var vm = this;
     var user = UserFactory.user_information;
     vm.submit = submit;
-    console.log(user);
     vm.userDetails = {
       email: user.email,
       username: user.username,
@@ -55,9 +58,45 @@
     };  
 
     function submit(form) {
-      UserFactory.saveMe(vm.userDetails, function(response) {
-        Notification.success('Profile updated.');
-      });      
+      if (form.$valid) {
+        UserFactory.saveMe(vm.userDetails, 
+          function(response) {
+            Notification.success('Profile updated.');
+          }, function(error) {
+            Notification.error('Unable to update profile.');        
+          }
+        );      
+      }
+    }
+  }
+
+  ActivationCtrl.$inject = ['$state', '$stateParams', 'UserFactory', 'Notification'];
+  function ActivationCtrl($state, $stateParams, UserFactory, Notification) {
+    var vm = this;
+
+    UserFactory.activate({uid: $stateParams.uid, token: $stateParams.token},
+      function(response) {
+        $state.go('app.login');
+      }, function(error) {
+        Notification.error('Unable to activate account.');        
+      }
+    );
+  }
+
+  RegistrationCtrl.$inject = ['$state', 'UserFactory', 'Notification'];
+  function RegistrationCtrl($state, UserFactory, Notification) {
+    var vm = this;
+    vm.submit = submit;
+    vm.userDetails = {};  
+
+    function submit(form) {
+      if (form.$valid) {
+        UserFactory.register(vm.userDetails, function(response) {
+          Notification.success('Account created.');
+        }, function(error) {
+          Notification.error('Unable to create account.');        
+        });      
+      }
     }
   }
 
@@ -69,9 +108,13 @@
     vm.save = save;
 
     function save() {
-      UserFactory.setTenses(vm.tenses, function(response) {
-        Notification.success('Tenses updated.');
-      });
+      UserFactory.setTenses(vm.tenses, 
+        function(response) {
+          Notification.success('Tenses updated.');
+        }, function(error) {
+          Notification.error('Unable to update tenses.');          
+        }
+      );
     }
   }
 
@@ -94,8 +137,13 @@
     }
 
     function setInfinitive(pk, selected) {
-      Notification.success('Infinitive updated.');
-      UserFactory.setInfinitive({pk: pk, selected: selected});
+      UserFactory.setInfinitive({pk: pk, selected: selected},
+        function(response) {
+           Notification.success('Infinitive updated.');
+         }, function(error) {
+           Notification.error('Unable to update infinitive.');
+         }
+      );
     }
   }
 })();

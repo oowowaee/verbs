@@ -13,6 +13,8 @@
       {
         'login': {url: DOMAIN + '/api/auth/login/', method: 'POST', interceptor: loginInterceptor()},
         'logout': {url: DOMAIN + '/api/auth/logout/', method: 'POST', interceptor: logoutInterceptor()},
+        'activate': {url: DOMAIN + '/api/auth/activate/', method: 'POST'},
+        'register': {url: DOMAIN + '/api/auth/register/', method: 'POST'},
         'me': {url: DOMAIN + '/api/auth/me/', method: 'GET', interceptor: userInterceptor()},
         'saveMe': {url: DOMAIN + '/api/auth/me/', method: 'PUT', interceptor: userInterceptor()},
         'getTenses': {url: DOMAIN + '/api/user/tenses/', method: 'GET', isArray: true},
