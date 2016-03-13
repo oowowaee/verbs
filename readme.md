@@ -1,3 +1,5 @@
+Using Mailcatcher
+
 Running the django server:
 
 	cd django 
@@ -34,7 +36,7 @@ api/
 		*admins need to be able to create new verbs
 
 	+infinitives/
-		+:id/
+		+/:id
 		*admins need to be able to post, to update the list of active verbs
 			/activate?
 
@@ -46,19 +48,19 @@ api/
 		*users need to be able to set their tenses and verbs
 
 	user/
-		+/tenses 		(GET)
-		+/tenses 		(PATCH)
-		/infinitives	(GET)
-		/infinitives	(PATCH)
+		+/tenses 			(GET)
+		+/tenses 			(PATCH)
+		/infinitives		(GET)
+		/infinitives/:id	(PATCH)
 
 	(+Added by Djoser)
+	(+Currently using a custom version where /User.USERNAME_FIELD/ is removed)
 	auth/
 		/me/
 		/register/
-		/login/ (token based authentication)
+		/login/  (token based authentication)
 		/logout/ (token based authentication)
 		/activate/
-		/{{ User.USERNAME_FIELD }}/
 		/password/
 		/password/reset/
 		/password/reset/confirm/

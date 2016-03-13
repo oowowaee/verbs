@@ -1,6 +1,6 @@
 (function() {
-  angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'ui-notification', 'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
-  .run(['$http', '$state', '$window', '$rootScope', 'UserFactory', function($http, $state, $window, $rootScope, UserFactory) {
+  angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'ui-notification', 'LocalStorageModule', 'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
+  .run(['$http', '$state', '$rootScope', 'localStorageService', 'UserFactory', function($http, $state, $rootScope, localStorageService, UserFactory) {
     $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
       console.log('$stateChangeStart to '+toState.to+'- fired when the transition begins. toState,toParams : \n',toState, toParams);
     });
@@ -28,10 +28,13 @@
       exists in localStorage.  If it does, log the user in, otherwise redirect to the loginpage.
      */
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams, options) {
-      if (UserFactory.user_information && !UserFactory.user_information.isLoggedIn && $window.localStorage.verb_app !== undefined) {
-        console.log($window.localStorage.verb_app);
-        UserFactory.loginUser($window.localStorage.verb_app.token);
-        angular.extend(UserFactory.user_information, $window.localStorage.verb_app.user);
+      var token = localStorageService.get('token');
+      var user_information = localStorageService.get('user_information');
+
+      //If we have the information stored locally, then use that to log the user in
+      if (UserFactory.user_information && !UserFactory.user_information.isLoggedIn && token !== null) {
+        UserFactory.loginUser(token);
+        angular.extend(UserFactory.user_information, user_information);
       } 
 
       if (toState.requiresLogin && (!UserFactory.user_information || !UserFactory.user_information.isLoggedIn)) {
@@ -41,9 +44,13 @@
     });
   }])
 
-  .config(['$stateProvider', '$urlRouterProvider', '$resourceProvider', 'NotificationProvider', function($stateProvider, $urlRouterProvider, $resourceProvider, NotificationProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$resourceProvider', 'NotificationProvider', 'localStorageServiceProvider', function($stateProvider, $urlRouterProvider, $resourceProvider, NotificationProvider, localStorageServiceProvider) {
+
+    //Default storage is localstorage
+    localStorageServiceProvider.setPrefix('verb_app');
+
     NotificationProvider.setOptions({
-      delay: 4000,
+      delay: 3500,
       startTop: 20,
       startRight: 10,
       verticalSpacing: 20,

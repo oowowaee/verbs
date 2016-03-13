@@ -27,7 +27,5 @@
     "gulp-uglify": "^1.5.1",
     "gulp-watch": "^4.3.5"
   },
-  "dependencies": {
-    "angular-local-storage": "^0.2.6"
-  }
+  "dependencies": {}
 }

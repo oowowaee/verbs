@@ -1,13 +1,13 @@
 (function() {
-  angular.module('verbs.factories', ['ngResource', 'ui-notification'])
+  angular.module('verbs.factories', ['ngResource', 'ui-notification', 'LocalStorageModule'])
         .factory('UserFactory', UserFactory)
         .factory('RandomEndPointFactory', RandomEndPointFactory)
         .factory('ConjugationFactory', ConjugationFactory)
         .factory('GerundFactory', GerundFactory)
         .factory('ParticipleFactory', ParticipleFactory);
 
-  UserFactory.$inject = ['$http', '$resource', '$window', 'DOMAIN', 'Notification'];
-  function UserFactory($http, $resource, $window, DOMAIN, Notification) {
+  UserFactory.$inject = ['$http', '$resource', 'DOMAIN', 'Notification', 'localStorageService'];
+  function UserFactory($http, $resource, DOMAIN, Notification, localStorageService) {
     var User = $resource(DOMAIN + '/api/auth/',
       null,
       {
@@ -21,7 +21,7 @@
         'setInfinitive': {url: DOMAIN + '/api/user/infinitive/:pk', params: {pk: '@pk'}, method: 'PATCH'},
       }
     );
-    User.user_information = {isLoggedIn: false};
+    User.user_information = { isLoggedIn: false };
     User.loginUser = loginUser;
     User.logoutUser = logoutUser;
     return User;
@@ -33,8 +33,7 @@
       if (token !== undefined) {
         User.user_information.isLoggedIn = true;
         $http.defaults.headers.common.Authorization = 'Token ' + token;
-        $window.localStorage.verb_app = {};
-        $window.localStorage.verb_app.token = token;
+        localStorageService.set('token', token);
         if (User.user_information.username === undefined) {
           User.me();
         }
@@ -44,15 +43,12 @@
     function logoutUser() {
       User.user_information.isLoggedIn = false;
       $http.defaults.headers.common.Authorization = undefined;
-      $window.localStorage.removeItem('verb_app');
+      localStorageService.clearAll();
     }
 
     function updateUserInformation(data) {
-      console.log(data);
       angular.extend(User.user_information, data);
-      console.log(User.user_information);
-      console.log($window.localStorage.verb_app.token);
-      $window.localStorage.verb_app.user_information = data;
+      localStorageService.set('user_information', data);
     }
 
     function loginInterceptor() {

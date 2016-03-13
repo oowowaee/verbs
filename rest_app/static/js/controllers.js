@@ -33,9 +33,9 @@
       if(form.$valid) {
         UserFactory.login({
           'username': vm.authorization.username,
-          'password': vm.authorization.password}, function(res) {
+          'password': vm.authorization.password}, function(response) {
             $state.go('app.home');
-          }, function(err) {
+          }, function(error) {
             vm.invalidLogin = true;
           });
       }
@@ -46,7 +46,7 @@
   function ProfileCtrl($state, UserFactory) {
     var vm = this;
     var user = UserFactory.user_information;
-    vm.save = save;
+    vm.submit = submit;
     console.log(user);
     vm.userDetails = {
       email: user.email,
@@ -54,7 +54,7 @@
       vosotros: user.vosotros 
     };  
 
-    function save() {
+    function submit(form) {
       UserFactory.saveMe(vm.userDetails, function(response) {
         Notification.success('Profile updated.');
       });      
