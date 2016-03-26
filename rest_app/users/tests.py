@@ -151,8 +151,20 @@ class BasicSerializerTestCase(APITestCase):
     self.assertEqual(self.user.tenses.count(), active_tenses.count())
 
   def test_user_can_only_see_active_infinitives(self):
-    pass
+    '''Verify that the only infinitives returned from the get request are active ones.'''
+    NUMBER_ACTIVATED = 3
+
+    Infinitive.objects.all().update(active = False)
+    ids_to_update = [x.pk for x in Infinitive.objects.all()[:NUMBER_ACTIVATED]]
+    Infinitive.objects.filter(pk__in = ids_to_update).update(active = True)
     
+    url = reverse('user-infinitives')
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    result = json.loads(response.content)
+    #We need to remember the pagination headers
+    self.assertEqual(len(result['results']), NUMBER_ACTIVATED)
+
   def test_user_can_only_interact_with_active_infinitives(self):
     ''' Verify that the user can only see and set active tenses'''
 
