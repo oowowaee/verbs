@@ -1,0 +1,4 @@
+New db dump for verb app:
+	./manage.py dumpdata verbs --indent 4 > verbs/fixtures/initial_data.json
+
+./manage.py test users.tests --verbosity=0
