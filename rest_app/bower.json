@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "angular-ui-notification": "^0.1.0",
-    "angular-local-storage": "^0.2.5"
+    "angular-local-storage": "^0.2.5",
+    "angular-messages": "ng-messages#*"
   }
 }
