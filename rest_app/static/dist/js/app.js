@@ -285,10 +285,11 @@
   UserInfinitivesController.$inject = ['Infinitives', 'Notification', 'UserFactory', '$state', '$stateParams'];
   function UserInfinitivesController(Infinitives, Notification, UserFactory, $state, $stateParams) {
     var vm = this;
+    vm.total_pages = Infinitives.total_pages;
     vm.infinitives = Infinitives.results;
     vm.totalInfinitives = vm.infinitives.length;
     vm.getPrev = $stateParams.page > 1 ? getPrev : undefined;
-    vm.getNext = getNext;
+    vm.getNext = $stateParams.page < vm.total_pages ? getNext : undefined;
     vm.setInfinitive = setInfinitive;
     vm.thirdOfResults = Math.ceil(vm.infinitives.length/3);
 

@@ -1,3 +1,5 @@
+import math
+
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import list_route
@@ -20,11 +22,20 @@ class ListOrUpdateViewSet(mixins.ListModelMixin,
                           mixins.RetrieveModelMixin,
                           mixins.UpdateModelMixin,
                           viewsets.GenericViewSet):
-    pass
+  pass
 
 
 class InfinitivePagination(DefaultPagination):
-	page_size = 42
+  page_size = 42
+
+  def get_paginated_response(self, data):
+    return Response({
+      'next': self.get_next_link(),
+      'previous': self.get_previous_link(),
+      'count': self.page.paginator.count,
+      'results': data,
+      'total_pages': math.ceil(self.page.paginator.count / self.page_size),
+      })
 
 class RandomViewMixin(object):
 	# For GET Requests

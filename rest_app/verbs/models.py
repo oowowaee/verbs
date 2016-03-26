@@ -37,6 +37,7 @@ class Tense(models.Model):
   mood = models.CharField(max_length = 50) 
   mood_translation = models.CharField(max_length = 50) 
   default = models.BooleanField(default = False)
+  active = models.BooleanField(default = True)
 
   def __str__(self):
     return '{0} {1}'.format(self.tense_translation, self.mood)

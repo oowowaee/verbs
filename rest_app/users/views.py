@@ -2,6 +2,7 @@ from django.db.models import Q
 
 from .models import VerbUser
 from .serializers import *
+from django.core.exceptions import ObjectDoesNotExist
 
 from common.utils import AnyNotNull
 from common.views import DefaultPagination, InfinitivePagination
@@ -30,7 +31,8 @@ class UserViewSet(viewsets.ModelViewSet):
     if request.method == 'GET':
       queryset = Tense.objects.filter(
                     Q(tense_users__isnull = True) |
-                    Q(tense_users__id = user_id)
+                    Q(tense_users__id = user_id),
+                    active = True
                     ).annotate(selected = AnyNotNull('tense_users__id')
                     ).order_by('id')
 
@@ -39,30 +41,42 @@ class UserViewSet(viewsets.ModelViewSet):
     elif request.method == 'PATCH':
       #Otherwise, extract the id fields from the request data and set the currently logged in user's
       #verb tenses to the ones specified
-      keys = [x['id'] for x in request.data if x['selected']]
-      request.user.tenses = Tense.objects.filter(pk__in = keys) 
       try:
-        request.user.save()
-        response_code = status.HTTP_204_NO_CONTENT     
+        keys = [x['id'] for x in request.data if x['selected']]
+        request.user.tenses = Tense.objects.filter(pk__in = keys) 
+        try:
+          request.user.save()
+          response_code = status.HTTP_204_NO_CONTENT     
+        except: # pragma: no cover
+          response_code = status.HTTP_400_BAD_REQUEST  
+          logger.error("Error saving user tenses: user#{0} tenses{1}".format(user_id, keys))
       except: # pragma: no cover
         response_code = status.HTTP_400_BAD_REQUEST  
-        logger.error("Error saving user tenses: user#{0} tenses{1}".format(user_id, keys))
+        logger.error("Error saving user tenses: user#{0} data:{1}".format(user_id, request.data))
       return Response(status=response_code)
 
 
   #TODO: Test this route without a pk
   @list_route(methods=['get', 'patch'])
   def infinitive(self, request, infinitive_pk=None):
-    obj = Infinitive.objects.filter(pk = infinitive_pk)[0]
-    if request.method == 'PATCH':
-      if request.data['selected']:
-        request.user.infinitives.add(obj)
-      else:
-        request.user.infinitives.remove(obj)
-      request.user.save
+    try:
+      obj = Infinitive.objects.get(pk = infinitive_pk, active = True)
 
-    serializer = UserInfinitiveSerializer(obj)
-    return Response(serializer.data)
+      if request.method == 'PATCH':
+        if request.data['selected']:
+          request.user.infinitives.add(obj)
+        else:
+          request.user.infinitives.remove(obj)
+        request.user.save
+
+      serializer = UserInfinitiveSerializer(obj)
+      return Response(serializer.data)
+    except ObjectDoesNotExist:
+      if request.method == 'PATCH':
+        response_code = status.HTTP_400_BAD_REQUEST    
+      else:
+        response_code = status.HTTP_404_NOT_FOUND
+      return Response(status=response_code)      
 
 
   @list_route(pagination_class = InfinitivePagination)
@@ -74,7 +88,8 @@ class UserViewSet(viewsets.ModelViewSet):
     if request.method == 'GET':
       queryset = Infinitive.objects.filter(
                     Q(infinitive_users__isnull = True) |
-                    Q(infinitive_users__id = user_id)
+                    Q(infinitive_users__id = user_id),
+                    active = True
                     ).annotate(selected = AnyNotNull('infinitive_users__id'))
 
       #We need to manually paginate this, as we're using a custom serializer

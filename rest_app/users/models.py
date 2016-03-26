@@ -13,14 +13,14 @@ class VerbUser(AbstractUser):
   REQUIRED_FIELDS = ['vosotros', 'email']
 
   def save(self, *args, **kwargs):
-  	pk = self.pk
-  	super(VerbUser, self).save(*args, **kwargs)
+    pk = self.pk
+    super(VerbUser, self).save(*args, **kwargs)
 
-  	if not pk:
-  		#Create the default associations to the verbs
-  		self.infinitives = Infinitive.objects.filter(from_duolingo = True)
-  		self.tenses = Tense.objects.filter(default = True)
-  		self.save()
+    if not pk:
+      #Create the default associations to the verbs
+      self.infinitives = Infinitive.objects.filter(from_duolingo = True, active = True)
+      self.tenses = Tense.objects.filter(default = True, active = True)
+      self.save()
 
 class History(models.Model):
   content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
