@@ -1,5 +1,6 @@
 (function() {
-  angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'ui-notification', 'LocalStorageModule', 'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
+  angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'ui-notification', 'LocalStorageModule', 
+    'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers', 'verbs.directives'])
   .run(['$http', '$state', '$rootScope', 'localStorageService', 'UserFactory', function($http, $state, $rootScope, localStorageService, UserFactory) {
     $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
       console.log('$stateChangeStart to '+toState.to+'- fired when the transition begins. toState,toParams : \n',toState, toParams);
@@ -99,6 +100,17 @@
           templateUrl: 'profile.html',
           controller: 'ProfileCtrl',
           controllerAs: 'profilePage'
+        }
+      }
+    }).
+    state('app.practice', {
+      url: '/practice',
+      requiresLogin: true,
+      views: {
+        'content': {
+          templateUrl: 'practice.html',
+          controller: 'PracticeCtrl',
+          controllerAs: 'practicePage'
         }
       }
     }).

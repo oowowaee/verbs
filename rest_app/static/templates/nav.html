@@ -31,6 +31,8 @@
             <li ng-show="UserCtrl.user.isLoggedIn"><a ui-sref="app.profile">Profile</a></li>
             <li ng-show="UserCtrl.user.isLoggedIn"><a ng-click="UserCtrl.logout()" href="#">Logout</a></li>
             <li ng-show="UserCtrl.user.isLoggedIn" role="separator" class="divider"></li>
+            <li ng-show="UserCtrl.user.isLoggedIn"><a ui-sref="app.practice">Practice</a></li>
+            <li ng-show="UserCtrl.user.isLoggedIn" role="separator" class="divider"></li>
             <li ng-show="UserCtrl.user.isLoggedIn"><a ui-sref="app.tenses">Set Tenses</a></li>
             <li ng-show="UserCtrl.user.isLoggedIn"><a ui-sref="app.infinitives">Set Verbs</a></li>
           </ul>

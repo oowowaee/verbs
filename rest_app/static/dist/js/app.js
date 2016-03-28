@@ -1,5 +1,6 @@
 (function() {
-  angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'ui-notification', 'LocalStorageModule', 'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers'])
+  angular.module('verb', ['ui.router', 'ui.bootstrap', 'ngResource', 'templates', 'ui-notification', 'LocalStorageModule', 
+    'verbs.filters', 'verbs.constants', 'verbs.factories', 'verbs.controllers', 'verbs.directives'])
   .run(['$http', '$state', '$rootScope', 'localStorageService', 'UserFactory', function($http, $state, $rootScope, localStorageService, UserFactory) {
     $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
       console.log('$stateChangeStart to '+toState.to+'- fired when the transition begins. toState,toParams : \n',toState, toParams);
@@ -102,6 +103,17 @@
         }
       }
     }).
+    state('app.practice', {
+      url: '/practice',
+      requiresLogin: true,
+      views: {
+        'content': {
+          templateUrl: 'practice.html',
+          controller: 'PracticeCtrl',
+          controllerAs: 'practicePage'
+        }
+      }
+    }).
     state('app.register', {
       url: '/register',
       views: {
@@ -164,13 +176,27 @@
 })();
 (function() {
   angular.module('verbs.controllers', ['ngMessages', 'ui-notification'])
+          .controller('ActivationCtrl', ActivationCtrl)
           .controller('AppCtrl', AppCtrl)
           .controller('LoginCtrl', LoginCtrl)
-          .controller('RegistrationCtrl', RegistrationCtrl)
-          .controller('ActivationCtrl', ActivationCtrl)
+          .controller('PracticeCtrl', PracticeCtrl)
           .controller('ProfileCtrl', ProfileCtrl)
+          .controller('RegistrationCtrl', RegistrationCtrl)
           .controller('UserTensesController', UserTensesController)
           .controller('UserInfinitivesController', UserInfinitivesController);
+
+  ActivationCtrl.$inject = ['$state', '$stateParams', 'UserFactory', 'Notification'];
+  function ActivationCtrl($state, $stateParams, UserFactory, Notification) {
+    var vm = this;
+
+    UserFactory.activate({uid: $stateParams.uid, token: $stateParams.token},
+      function(response) {
+        $state.go('app.login');
+      }, function(error) {
+        Notification.error('Unable to activate account.');        
+      }
+    );
+  }
 
   AppCtrl.$inject = ['$state', '$scope', 'UserFactory'];
   function AppCtrl($state, $scope, UserFactory) {
@@ -210,6 +236,17 @@
     }
   }
 
+  PracticeCtrl.$inject = ['$scope', '$state'];
+  function PracticeCtrl($scope, $state) {
+    var vm = this;
+    vm.answer;
+    vm.question = "Verb Conjugation Question";
+
+    vm.alertVal = function() {
+      console.log(vm.answer);
+    };
+  }
+
   ProfileCtrl.$inject = ['$state', 'UserFactory', 'Notification'];
   function ProfileCtrl($state, UserFactory, Notification) {
     var vm = this;
@@ -232,19 +269,6 @@
         );      
       }
     }
-  }
-
-  ActivationCtrl.$inject = ['$state', '$stateParams', 'UserFactory', 'Notification'];
-  function ActivationCtrl($state, $stateParams, UserFactory, Notification) {
-    var vm = this;
-
-    UserFactory.activate({uid: $stateParams.uid, token: $stateParams.token},
-      function(response) {
-        $state.go('app.login');
-      }, function(error) {
-        Notification.error('Unable to activate account.');        
-      }
-    );
   }
 
   RegistrationCtrl.$inject = ['$state', 'UserFactory', 'Notification'];
@@ -313,6 +337,41 @@
   }
 })();
 (function() {
+  angular.module('verbs.directives', []).
+
+  directive('inputWithKeyboard', function() {
+  var tpl = '<div class="input-with-keyboard form-group"> \
+        <input class="input-with-keyboard__input form-control" ng-model="modelVar" type="text" /> \
+        <div class="text-center"> \
+          <div class="input-with-keyboard__btn-group btn-group text-center"> \
+            <a ng-click="updateInput($event)" class="input-with-keyboard__btn btn btn-lg btn-default">á</a> \
+            <a ng-click="updateInput($event)" class="input-with-keyboard__btn btn btn-lg btn-default">é</a> \
+            <a ng-click="updateInput($event)" class="input-with-keyboard__btn btn btn-lg btn-default">í</a> \
+            <a ng-click="updateInput($event)" class="input-with-keyboard__btn btn btn-lg btn-default">ó</a> \
+            <a ng-click="updateInput($event)" class="input-with-keyboard__btn btn btn-lg btn-default">ú</a> \
+            <a ng-click="updateInput($event)" class="input-with-keyboard__btn btn btn-lg btn-default">ü</a> \
+            <a ng-click="updateInput($event)" class="input-with-keyboard__btn btn btn-lg btn-default">ñ</a> \
+          </div> \
+        </div> \
+      </div>';
+    return {
+      restrict: 'E',
+      template: tpl,
+      replace: true,
+      scope: {
+        modelVar: '='
+      },
+      link: function($scope, element, attrs) {
+        var inputElement = element.find('input');
+        $scope.updateInput = function(e) {
+          $scope.modelVar = $scope.modelVar ? $scope.modelVar + e.target.text : e.target.text; 
+        }
+      }
+    };
+  });
+
+})();
+(function() {
 	// Angular `slice` filter for arrays
 	/* http://jsfiddle.net/binarymuse/vquss/ */
 
@@ -335,7 +394,8 @@ $templateCache.put("errors.html","<script id=\"error-list.html\" type=\"text/ng-
 $templateCache.put("home.html","<div class=\"jumbotron\">\n	<h1>Navbar example</h1>\n	<p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>\n	<p>To see the difference between static and fixed top navbars, just scroll.</p>\n	<p>\n	  <a class=\"btn btn-lg btn-primary\" href=\"../../components/#navbar\" role=\"button\">View navbar docs &raquo;</a>\n	</p>\n</div>");
 $templateCache.put("infinitives.html","<h3>Set Infinitives</h3>\n\n<div class=\"col-md-4\">\n  <div class=\"checkbox\" ng-repeat=\"i in userInfinitives.infinitives | slice:0:userInfinitives.thirdOfResults track by i.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"i.selected\" ng-change=\"userInfinitives.setInfinitive(i.id, i.selected)\"/>\n      &nbsp;&nbsp;{{ i.name }}\n    </label>\n  </div>\n</div>\n<div class=\"col-md-4\">\n  <div class=\"checkbox\" ng-repeat=\"i in userInfinitives.infinitives | slice:userInfinitives.thirdOfResults:userInfinitives.thirdOfResults*2 track by i.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"i.selected\" ng-change=\"userInfinitives.setInfinitive(i.id, i.selected)\"/>\n      &nbsp;&nbsp;{{ i.name }}\n    </label>\n  </div>\n</div>\n<div class=\"col-md-4\">\n  <div class=\"checkbox\" ng-repeat=\"i in userInfinitives.infinitives | slice:userInfinitives.thirdOfResults*2:userInfinitives.totalInfinitives track by i.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"i.selected\" ng-change=\"userInfinitives.setInfinitive(i.id, i.selected)\"/>\n      &nbsp;&nbsp;{{ i.name }}\n    </label>\n  </div>\n</div>\n\n<div class=\"col-md-12\">\n  <button class=\"btn btn-primary\" ng-if=\"userInfinitives.getPrev\" ng-click=\"userInfinitives.getPrev()\">Prev</button>\n  <button class=\"pull-right btn btn-primary\" ng-if=\"userInfinitives.getNext\" ng-click=\"userInfinitives.getNext()\">Next</button>\n</div>");
 $templateCache.put("login.html","<br/>\n<br />\n<form name=\"loginForm\" class=\"form-horizontal col-md-8 col-md-offset-2\" novalidate ng-submit=\"loginPage.login(loginForm)\">\n  <div class=\"text-center\" ng-show=\"loginPage.invalidLogin\">\n    <div class=\"alert alert-danger\">\n      We were unable to log you in with the provided credentials.\n    </div>\n    <br />\n  </div>\n  <div class=\"form-group\">\n    <label for=\"username\" class=\"col-sm-2 control-label\" ng-class=\"{\'has-errors\': loginForm.username.$invalid && loginForm.$submitted, \'no-errors\': loginForm.username.$valid}\">\n      Username\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"username\" class=\"form-control\" type=\"text\" name=\"username\" ng-model=\"loginPage.authorization.username\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>     \n    <div class=\"error-container\" ng-show=\"loginForm.username.$error\" ng-messages=\"loginForm.username.$error\">\n      <div ng-messages-include=\"errors.html\"></div>\n    </div>\n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"password\" class=\"col-sm-2 control-label\" ng-class=\"{\'has-errors\': loginForm.password.$invalid && loginForm.$submitted, \'no-errors\': loginForm.password.$valid}\">\n      Password\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"password\" class=\"form-control\" type=\"password\" name=\"password\" ng-model=\"loginPage.authorization.password\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"error-container last-error-container\" ng-show=\"loginForm.password.$error && loginForm.$submitted\" ng-messages=\"loginForm.password.$error\">\n      <div ng-messages-include=\"errors.html\"></div> \n    </div>      \n  </div>    \n\n  <br />\n  <br />\n\n  <div class=\"text-center\">\n    <button class=\"btn btn-primary\" type=\"submit\">\n      Sign In\n    </button>\n  </div>\n</form>");
-$templateCache.put("nav.html","<!-- Static navbar -->\n<nav class=\"navbar navbar-default navbar-static-top\">\n  <div class=\"container\">\n    <div class=\"navbar-header\">\n      <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#navbar\" aria-expanded=\"false\" aria-controls=\"navbar\">\n        <span class=\"sr-only\">Toggle navigation</span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n      </button>\n      <a class=\"navbar-brand\" href=\"#\">Verbs</a>\n    </div>\n    <div id=\"navbar\" class=\"navbar-collapse collapse\">\n      <ul class=\"nav navbar-nav navbar-right\">\n        <li class=\"active\"><a href=\"#\">Home</a></li>\n        <li uib-dropdown ng-show=\"UserCtrl.user.isLoggedIn\">\n          <a href=\"#\" uib-dropdown-toggle role=\"button\">Practice <span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\">\n            <li><a>Conjugations</a></li>\n            <li><a>Gerunds</a></li>\n            <li><a>Participles</a></li>\n            <li><a>Drill</a></li>\n          </ul>\n        </li>\n        <li ng-show=\"UserCtrl.user.isLoggedIn\"><a href=\"#contact\">History</a></li>\n        <li uib-dropdown>\n          <a href=\"#\" uib-dropdown-toggle role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">User <span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\">\n            <li ng-show=\"!UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.login\">Login</a></li>\n            <li ng-show=\"!UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.register\">Register</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.profile\">Profile</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ng-click=\"UserCtrl.logout()\" href=\"#\">Logout</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\" role=\"separator\" class=\"divider\"></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.tenses\">Set Tenses</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.infinitives\">Set Verbs</a></li>\n          </ul>\n        </li>\n      </ul>\n    </div><!--/.nav-collapse -->\n  </div>\n</nav>\n\n<div class=\"container\">\n  <!-- Main component for a primary marketing message or call to action -->\n  <div ui-view=\"content\"></div>\n</div> <!-- /container -->");
+$templateCache.put("nav.html","<!-- Static navbar -->\n<nav class=\"navbar navbar-default navbar-static-top\">\n  <div class=\"container\">\n    <div class=\"navbar-header\">\n      <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#navbar\" aria-expanded=\"false\" aria-controls=\"navbar\">\n        <span class=\"sr-only\">Toggle navigation</span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n      </button>\n      <a class=\"navbar-brand\" href=\"#\">Verbs</a>\n    </div>\n    <div id=\"navbar\" class=\"navbar-collapse collapse\">\n      <ul class=\"nav navbar-nav navbar-right\">\n        <li class=\"active\"><a href=\"#\">Home</a></li>\n        <li uib-dropdown ng-show=\"UserCtrl.user.isLoggedIn\">\n          <a href=\"#\" uib-dropdown-toggle role=\"button\">Practice <span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\">\n            <li><a>Conjugations</a></li>\n            <li><a>Gerunds</a></li>\n            <li><a>Participles</a></li>\n            <li><a>Drill</a></li>\n          </ul>\n        </li>\n        <li ng-show=\"UserCtrl.user.isLoggedIn\"><a href=\"#contact\">History</a></li>\n        <li uib-dropdown>\n          <a href=\"#\" uib-dropdown-toggle role=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">User <span class=\"caret\"></span></a>\n          <ul class=\"dropdown-menu\">\n            <li ng-show=\"!UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.login\">Login</a></li>\n            <li ng-show=\"!UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.register\">Register</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.profile\">Profile</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ng-click=\"UserCtrl.logout()\" href=\"#\">Logout</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\" role=\"separator\" class=\"divider\"></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.practice\">Practice</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\" role=\"separator\" class=\"divider\"></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.tenses\">Set Tenses</a></li>\n            <li ng-show=\"UserCtrl.user.isLoggedIn\"><a ui-sref=\"app.infinitives\">Set Verbs</a></li>\n          </ul>\n        </li>\n      </ul>\n    </div><!--/.nav-collapse -->\n  </div>\n</nav>\n\n<div class=\"container\">\n  <!-- Main component for a primary marketing message or call to action -->\n  <div ui-view=\"content\"></div>\n</div> <!-- /container -->");
+$templateCache.put("practice.html","<br/>\n<br />\n<div class=\"panel panel-default\">\n  <div class=\"panel-body\">\n    <div class=\"col col-md-offset-3\">\n      <h4 class=\"text-center\">{{ practicePage.question }}</h4>\n      <form name=\"practiceForm\" novalidate>\n        <input-with-keyboard model-var=\"practicePage.answer\" />\n      </form>\n      <br />\n    </div>\n    <a ng-click=\"practicePage.alertVal()\" class=\"pull-right btn-lg btn btn-primary\">Onward!</a>\n  </div>\n</div>");
 $templateCache.put("profile.html","<br/>\n<br />\n<form name=\"profileForm\" class=\"form-horizontal col-md-8 col-md-offset-2\" novalidate ng-submit=\"profilePage.submit(profileForm)\">\n  <div class=\"form-group\">\n    <div class=\"checkbox pull-right\">\n      <label>\n        <input type=\"checkbox\" ng-model=\"profilePage.userDetails.vosotros\" />\n        &nbsp;&nbsp;Vosotros\n      </label>\n    </div>\n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"username\" class=\"col-sm-2 control-label\">\n      Username\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"username\" disabled class=\"form-control\" type=\"text\" ng-model=\"profilePage.userDetails.username\">\n    </div>     \n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"email\" class=\"col-sm-2 control-label\">\n      Email\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"email\" class=\"form-control\" type=\"email\" name=\"email\" ng-model=\"profilePage.userDetails.email\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"profileForm.email.$touched || profileForm.$submitted\" ng-messages=\"profileForm.email.$error\">\n      <span ng-message=\"email\">\n        A valid email is required!\n      </span>\n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>    \n\n  <br />\n  <br />\n\n  <div class=\"text-center\">\n    <button class=\"btn btn-primary\" type=\"submit\">\n      Save\n    </button>\n  </div>\n</form>");
 $templateCache.put("register.html","<br/>\n<br />\n<form name=\"registrationForm\" class=\"form-horizontal col-md-8 col-md-offset-2\" novalidate ng-submit=\"registrationPage.submit(registrationForm)\">\n  <div class=\"form-group\">\n    <label for=\"username\" class=\"col-sm-2 control-label\">\n      Username\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"username\" type=\"text\" name=\"username\" class=\"form-control\" type=\"text\" ng-model=\"registrationPage.userDetails.username\">\n    </div>     \n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"registrationForm.username.$touched || registrationForm.$submitted\" ng-messages=\"registrationForm.username.$error\">    \n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>\n\n  <div class=\"form-group\">\n    <label for=\"email\" class=\"col-sm-2 control-label\">\n      Email\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"email\" class=\"form-control\" type=\"email\" name=\"email\" ng-model=\"registrationPage.userDetails.email\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"registrationForm.email.$touched || registrationForm.$submitted\" ng-messages=\"registrationForm.email.$error\">\n      <span ng-message=\"email\">\n        A valid email is required!\n      </span>\n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>    \n\n  <div class=\"form-group\">\n    <label for=\"password\" class=\"col-sm-2 control-label\">\n      Password\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"password\" class=\"form-control\" type=\"password\" name=\"password\" ng-model=\"registrationPage.userDetails.password\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"registrationForm.password.$touched || registrationForm.$submitted\" ng-messages=\"registrationForm.password.$error\">\n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>    \n\n  <div class=\"form-group\">\n    <label for=\"password_confirmation\" class=\"col-sm-2 control-label\">\n      Confirm Password\n    </label>\n    <div class=\"col-sm-10\">\n      <input id=\"password_confirmation\" class=\"form-control\" type=\"password\" name=\"password_confirmation\" ng-model=\"registrationPage.userDetails.password_confirmation\" ng-minlength=\"5\" ng-maxlength=\"20\" required>\n    </div>\n    <div class=\"col-sm-10 pull-right error-message\" ng-show=\"registrationForm.password_confirmation.$touched || registrationForm.$submitted\" ng-messages=\"registrationForm.password_confirmation.$error\">    \n      <span ng-message=\"required\">\n        This field is required!\n      </span>    \n    </div>      \n  </div>    \n\n  <br />\n  <br />\n\n  <div class=\"text-center\">\n    <button class=\"btn btn-primary\" type=\"submit\">\n      Save\n    </button>\n  </div>\n</form>");
 $templateCache.put("tenses.html","<h3>Set Tenses</h3>\n\n<div class=\"col-md-6\">\n  <div class=\"checkbox\" ng-repeat=\"t in userTenses.tenses | slice:0:userTenses.totalTenses/2 track by t.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"t.selected\" />\n      &nbsp;&nbsp;{{ t.translation }}\n    </label>\n  </div>\n</div>\n<div class=\"col-md-6\">\n  <div class=\"checkbox\" ng-repeat=\"t in userTenses.tenses | slice:userTenses.totalTenses/2:userTenses.totalTenses track by t.id\">\n    <label>\n    <input type=\"checkbox\" ng-model=\"t.selected\" />\n      &nbsp;&nbsp;{{ t.translation }}\n    </label>\n  </div>\n</div>\n\n<div class=\"text-center\">\n  <button class=\"btn btn-primary\" ng-click=\"userTenses.save()\">Save</button>\n</div>");}]);})();

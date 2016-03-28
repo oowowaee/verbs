@@ -1,12 +1,26 @@
 (function() {
   angular.module('verbs.controllers', ['ngMessages', 'ui-notification'])
+          .controller('ActivationCtrl', ActivationCtrl)
           .controller('AppCtrl', AppCtrl)
           .controller('LoginCtrl', LoginCtrl)
-          .controller('RegistrationCtrl', RegistrationCtrl)
-          .controller('ActivationCtrl', ActivationCtrl)
+          .controller('PracticeCtrl', PracticeCtrl)
           .controller('ProfileCtrl', ProfileCtrl)
+          .controller('RegistrationCtrl', RegistrationCtrl)
           .controller('UserTensesController', UserTensesController)
           .controller('UserInfinitivesController', UserInfinitivesController);
+
+  ActivationCtrl.$inject = ['$state', '$stateParams', 'UserFactory', 'Notification'];
+  function ActivationCtrl($state, $stateParams, UserFactory, Notification) {
+    var vm = this;
+
+    UserFactory.activate({uid: $stateParams.uid, token: $stateParams.token},
+      function(response) {
+        $state.go('app.login');
+      }, function(error) {
+        Notification.error('Unable to activate account.');        
+      }
+    );
+  }
 
   AppCtrl.$inject = ['$state', '$scope', 'UserFactory'];
   function AppCtrl($state, $scope, UserFactory) {
@@ -46,6 +60,17 @@
     }
   }
 
+  PracticeCtrl.$inject = ['$scope', '$state'];
+  function PracticeCtrl($scope, $state) {
+    var vm = this;
+    vm.answer;
+    vm.question = "Verb Conjugation Question";
+
+    vm.alertVal = function() {
+      console.log(vm.answer);
+    };
+  }
+
   ProfileCtrl.$inject = ['$state', 'UserFactory', 'Notification'];
   function ProfileCtrl($state, UserFactory, Notification) {
     var vm = this;
@@ -68,19 +93,6 @@
         );      
       }
     }
-  }
-
-  ActivationCtrl.$inject = ['$state', '$stateParams', 'UserFactory', 'Notification'];
-  function ActivationCtrl($state, $stateParams, UserFactory, Notification) {
-    var vm = this;
-
-    UserFactory.activate({uid: $stateParams.uid, token: $stateParams.token},
-      function(response) {
-        $state.go('app.login');
-      }, function(error) {
-        Notification.error('Unable to activate account.');        
-      }
-    );
   }
 
   RegistrationCtrl.$inject = ['$state', 'UserFactory', 'Notification'];

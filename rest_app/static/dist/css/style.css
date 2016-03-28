@@ -8675,3 +8675,9 @@ input[type="checkbox"],
   border-left: 3px solid #e51c23;
   margin-top: 5px;
   min-height: 0px; }
+
+.input-with-keyboard__btn-group {
+  padding-top: 10px; }
+
+.input-with-keyboard__btn {
+  text-transform: none; }
